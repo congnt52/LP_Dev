@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Testplan Name="TS38.141-Conducted Conformance Test" Description="RRU Conducted Conformance Test">
+  <DeviceList>
+    <Device Name="BBU" Description="BBU" Type="XEON D" IpAddress="192.168.120.192" Port="1970" User="root" Password="root" Assignment="BBU"/>
+    <Device Name="RRU" Description="RRU" Type="Pluto" IpAddress="192.168.120.2" Port="1970" User="root" Password="root" Assignment="RRU"/>
+    <Device Name="VSG1" Description="VSG" Type="N5182B" IpAddress="10.0.0.107" Port="22" Assignment="Wanted Signal"/>
+  </DeviceList>
+  <Configuration>
+    <Param Name="rruType" Description="RRU Type" Value="32T32R" Unit="-" />
+    <Param Name="rruFreq" Description="RRU Testing Frequency" Value="2600" Unit="MHz" />
+    <Param Name="rruPwrdBm" Description="RRU Testing Power in dBm" Value="40" Unit="dBm" />
+    <Param Name="rruPwrmW" Description="RRU Testing Power in mW" Value="10000" Unit="mW" />
+    <Param Name="rruBW" Description="RRU Bandwidth" Value="100" Unit="MHz" />
+    <Param Name="rruTestingPort" Description="RRU Testing Power in dBm" Value="1-32" Unit="-" />
+    <Param Name="rruTestingMode" Description="RRU Testing Mode" Value="Downlink" Unit="-" />
+    <Param Name="attenFilePath" Description="Attenuator Files Path" Value="C:\test3gpp\Configurations\LossConfig\Transmitters\Txn" Unit="-" />
+    <Param Name="resultPath" Description="Path to store result files (logs, result, measurement data)" Value="D:\32T32RTestResult\" Unit="-" />
+  </Configuration>
+  <TestcaseList>
+    <Testcase Name="Chapter 6: Transmitter Characteristics " Description="-">
+      <Specification Name="Base station output power" Description="Prat">
+        <Param Name="wsFrequencyLevel" Description="Testing Frequency" Value="2600" Unit="MHz" />
+        <Param Name="wsPowerLevel" Description="The initial setting value of the sensitivity measurement" Value="-95" Unit="dBm" />
+        <Param Name="enFindThreshold" Description="Allow for threshold sensitivity detection, no default" Value="No" Unit="-" />
+        <Param Name="stepSize" Description="Step size of power variation" Value="0.2" Unit="dB" />
+        <Param Name="wsSetRbOffset" Description="Set RBOffset" Value="" Unit="-" />
+        <Param Name="throughputLimit" Description="The throughput should be higher than throught limit of the reference channel" Value="95" Unit="%" />
+        <Param Name="wsRefMeasChannel" Description="Ref measurement channel of 3gpp ts 38.104 or ts 38.141-1" Value="C:\\test3gpp\\waveforms\\G-FRC-A1-5.scp" Unit="-" />
+        <Param Name="wsCSVFilePathRX" Description="Attenuator from VSG(WS) to RRU port Path" Value="C:\test3gpp\Configurations\LossConfig\Receivers\Wantedsignal" Unit="-" />
+        <Param Name="wsCSVFileFormat" Description="Attenuator Files name format" Value="RX" Unit="-" />
+      </Specification>
+      <Specification Name="Inband Blocking" Description="INB">
+        <Param Name="wsFrequencyLevel" Description="Testing Frequency" Value="2600" Unit="MHz" />
+        <Param Name="wsPowerLevel" Description="Set Power Level (WS)" Value="-89.9" Unit="dBm" />
+        <Param Name="wsSignalConfig" Description="WS configuration File Path" Value="No" Unit="-" />
+        <Param Name="wsEnRbOffset" Description="Enable RbOffset Mode(Wanted Signal)" Value="False" Unit="-" />
+        <Param Name="wsSetRbOffset" Description="Set RbOffset (Wanted Signal)" Value="0" Unit="-" />
+        <Param Name="wsATTFilePath" Description="Attenuator from VSG(WS) to RRU ports Path" Value="C:\test3gpp\Configurations\LossConfig\Receivers\Wantedsignal" Unit="-" />
+        <Param Name="wsATTFileFormat" Description="Attenuator Files name format(WS)" Value="RX" Unit="-" />
+        <Param Name="isPowerLevel" Description="Set Power Level (IS)" Value="-43" Unit="dBm" />
+        <Param Name="isSignalConfig" Description="IS configuration File Path" Value="....." Unit="-" />
+        <Param Name="isATTFilePath" Description="Attenuator from VSG(IS) to RRU ports Path" Value="C:\test3gpp\Configurations\LossConfig\Receivers\Interfersignal" Unit="-" />
+        <Param Name="isATTFileFormat" Description="Attenuator Files name format(IS)" Value="ISRX" Unit="-" />
+        <Param Name="deltaFoob" Description="delta FOOB" Value="30" Unit="MHz" />
+        <Param Name="channelFreqL" Description="Frequecy Low Edge of Channel BW" Value="2500" Unit="MHz" />
+        <Param Name="channelFreqH" Description="Frequecy High Edge of Channel BW" Value="2690" Unit="MHz" />
+        <Param Name="operatingBW" Description="Operating BW" Value="100" Unit="MHz" />
+        <Param Name="isFreqStep" Description="Step frequency of IS" Value="1" Unit="MHz" />
+        <Param Name="opMode" Description="Operating Test Mode: 0 = IS at 2 edges, 1 = IS sweep in range" Value="True" Unit="-" />
+      </Specification>
+    </Testcase>
+  </TestcaseList>
+</Testplan>

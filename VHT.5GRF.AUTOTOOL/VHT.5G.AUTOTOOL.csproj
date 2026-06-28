@@ -1,0 +1,899 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{99E501B4-B4A0-4E04-96E3-A47CDE8D4CD1}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>_5GAutoTool</RootNamespace>
+    <AssemblyName>5GAutoTool</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <PublishUrl>E:\Minhnt59\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ProductName>VHT5G</ProductName>
+    <PublisherName>VHT5G</PublisherName>
+    <SuiteName>VHT5G</SuiteName>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>2E5F18FB22CE042AF675590387DAF187D078061B</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>VHT.5G.AUTOTOOL_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Agilent.SA.Vsa.Interfaces, Version=24.20.223.0, Culture=neutral, PublicKeyToken=a25294fa6a616d95, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\Agilent.SA.Vsa.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="BetterConsole.Tables, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\BetterConsoleTables.2.0.5-rc1\lib\net471\BetterConsole.Tables.dll</HintPath>
+    </Reference>
+    <Reference Include="BetterConsoles.Colors, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\BetterConsoles.Colors.1.1.1\lib\net471\BetterConsoles.Colors.dll</HintPath>
+    </Reference>
+    <Reference Include="BetterConsoles.Core, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\BetterConsoles.Core.1.2.0\lib\net471\BetterConsoles.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Clawfoot.Core, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Clawfoot.Core.0.6.0\lib\net461\Clawfoot.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Clawfoot.Extensions, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Clawfoot.Extensions.0.6.0\lib\net461\Clawfoot.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="CsvHelper, Version=30.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.30.0.1\lib\net47\CsvHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="Ivi.Driver, Version=1.4.0.0, Culture=neutral, PublicKeyToken=a128c98f1d7717c1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\IVI Foundation\IVI\Microsoft.NET\Framework64\v2.0.50727\IviFoundationSharedComponents 1.4.1\Ivi.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="Ivi.Visa.Interop, Version=7.2.0.0, Culture=neutral, PublicKeyToken=a128c98f1d7717c1, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>C:\Program Files (x86)\IVI Foundation\VISA\VisaCom\Primary Interop Assemblies\Ivi.Visa.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Keysight.KtM941x.Fx45, Version=1.0.4939.1, Culture=neutral, PublicKeyToken=ced78d295d1e0f2b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>document\Keysight.KtM941x.Fx45.dll</HintPath>
+    </Reference>
+    <Reference Include="Keysight.SignalStudio.N7631">
+      <HintPath>C:\Program Files\Keysight\Signal Studio Pro\5G NR 2021.0201\Keysight.SignalStudio.N7631.dll</HintPath>
+    </Reference>
+    <Reference Include="mcl_pm64">
+      <HintPath>document\mcl_pm64_dll\mcl_pm64.dll</HintPath>
+    </Reference>
+    <Reference Include="MES_DLL">
+      <HintPath>..\..\Release Version 1.9 rebuild\MES_DLL.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.1.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.HashCode.1.0.0\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Word, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Office.Interop.Word.15.0.4797.1003\lib\net20\Microsoft.Office.Interop.Word.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Office.Excel.14.0.4760.1000\lib\net20\Office.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Renci.SshNet, Version=2020.0.1.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
+      <HintPath>..\packages\SSH.NET.2020.0.1\lib\net40\Renci.SshNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Renci.SshNet.Async, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Renci.SshNet.Async.1.4.0\lib\net40\Renci.SshNet.Async.dll</HintPath>
+    </Reference>
+    <Reference Include="SSO_DLL">
+      <HintPath>..\..\Release Version 1.9 rebuild\SSO_DLL.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=1.2.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.5.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ComponentModel.Annotations.4.5.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Memory, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.0\lib\netstandard2.0\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.4.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime, Version=4.1.1.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.4.3.1\lib\net462\System.Runtime.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.InteropServices.4.3.0\lib\net463\System.Runtime.InteropServices.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.2\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BlockDiagram_Setup\Chapter6_5.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BlockDiagram_Setup\Chapter6_5.Designer.cs">
+      <DependentUpon>Chapter6_5.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BlockDiagram_Setup\Chapter6_1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BlockDiagram_Setup\Chapter6_1.Designer.cs">
+      <DependentUpon>Chapter6_1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BlockDiagram_Setup\Chapter6_3.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BlockDiagram_Setup\Chapter6_3.Designer.cs">
+      <DependentUpon>Chapter6_3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BlockDiagram_Setup\Chapter6_4.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BlockDiagram_Setup\Chapter6_4.Designer.cs">
+      <DependentUpon>Chapter6_4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Connection_Interface\CustomHeader.cs" />
+    <Compile Include="Connection_Interface\OamCommunicator.cs" />
+    <Compile Include="Connection_Interface\TcpCommunicator.cs" />
+    <Compile Include="Connection_Interface\UploadFIle.cs" />
+    <Compile Include="CreateATTFiles.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateATTFiles.Designer.cs">
+      <DependentUpon>CreateATTFiles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DuplicateFile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DuplicateFile.Designer.cs">
+      <DependentUpon>DuplicateFile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="fLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="fLogin.Designer.cs">
+      <DependentUpon>fLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Instruments\IInstrument.cs" />
+    <Compile Include="Instruments\RRU\RRU.cs" />
+    <Compile Include="Instruments\VSA\VSA_Instruments\LitePoint.cs" />
+    <Compile Include="Instruments\VSA\VSA_Instruments\M9410A.cs" />
+    <Compile Include="Instruments\VSA\VSA_Instruments\M941x.cs" />
+    <Compile Include="Instruments\VSA\VSA_Instruments\N9020B.cs" />
+    <Compile Include="Instruments\VSG\VSG_Instruments\M9140a.cs" />
+    <Compile Include="Instruments\VSG\VSG_Instruments\SGS100A.cs" />
+    <Compile Include="Instruments\VSG\VSG_Instruments\SMW200A.cs" />
+    <Compile Include="ISFreqRange.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ISFreqRange.Designer.cs">
+      <DependentUpon>ISFreqRange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Log\LogAdapter.cs" />
+    <Compile Include="Measurements\CalibTool\CalibRx.cs" />
+    <Compile Include="Measurements\CalibTool\CalibTXPower.cs" />
+    <Compile Include="Measurements\Downlink\5GACLR.cs" />
+    <Compile Include="Measurements\Downlink\5GEVMFreqErr.cs" />
+    <Compile Include="Measurements\Downlink\5GIMDACLR.cs" />
+    <Compile Include="Measurements\Downlink\5GIMDSEM.cs" />
+    <Compile Include="Measurements\Downlink\5GIMDTSE.cs" />
+    <Compile Include="Measurements\Downlink\5GOBW.cs" />
+    <Compile Include="Measurements\Downlink\5GOnOffPower.cs" />
+    <Compile Include="Measurements\Downlink\5GOutputPower.cs" />
+    <Compile Include="Measurements\Downlink\5GSEM.cs" />
+    <Compile Include="Measurements\Downlink\5GSpur.cs" />
+    <Compile Include="Measurements\Downlink\5GTAE.cs" />
+    <Compile Include="Measurements\Form5GAT.DataFunctions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Measurements\Form5GAT.MeasurementBackgroundWorker.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Measurements\Measurements.cs" />
+    <Compile Include="Measurements\Parameters.cs" />
+    <Compile Include="Measurements\PortMapping.cs" />
+    <Compile Include="Measurements\Uplink\oneVSG.cs" />
+    <Compile Include="Measurements\Uplink\threeVSG.cs" />
+    <Compile Include="Measurements\Uplink\twoVSG.cs" />
+    <Compile Include="Models\Parameter.cs" />
+    <Compile Include="Models\TestcaseNode.cs" />
+    <Compile Include="Models\TestCaseTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Result.cs" />
+    <Compile Include="SetupAttenuator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetupAttenuator.Designer.cs">
+      <DependentUpon>SetupAttenuator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form5GAT.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form5GAT.Designer.cs">
+      <DependentUpon>Form5GAT.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Instruments\BBU\BBU_Version\OAM.cs" />
+    <Compile Include="Instruments\BBU\BBU_Version\XeonD.cs" />
+    <Compile Include="Instruments\Server.cs" />
+    <Compile Include="Instruments\Power Sensor\PowerSensor.cs" />
+    <Compile Include="Instruments\VSA\VSA_Instruments\FSW26.cs" />
+    <Compile Include="Instruments\VSA\VSA_Instruments\N9020A.cs" />
+    <Compile Include="Instruments\VSG\VSG_Instruments\CMW100.cs" />
+    <Compile Include="Instruments\VSG\VSG.cs" />
+    <Compile Include="Instruments\VSG\VSG_Instruments\N5182B.cs" />
+    <Compile Include="SetupBBU.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetupBBU.Designer.cs">
+      <DependentUpon>SetupBBU.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SetupRFSwitch.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetupRFSwitch.designer.cs">
+      <DependentUpon>SetupRFSwitch.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SetupRRU.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetupRRU.Designer.cs">
+      <DependentUpon>SetupRRU.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SetupVSA.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetupVSA.Designer.cs">
+      <DependentUpon>SetupVSA.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Instruments\BBU\BBU.cs" />
+    <Compile Include="Instruments\RFSwitch\RFSwitch.cs" />
+    <Compile Include="Instruments\VSA\VSA.cs" />
+    <Compile Include="Instruments\VSA\VSA_Instruments\FSV3030.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Connection_Interface\Telnet.cs" />
+    <Compile Include="SetupVSG.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetupVSG.Designer.cs">
+      <DependentUpon>SetupVSG.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ultis\DoubleBufferedListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <EmbeddedResource Include="BlockDiagram_Setup\Chapter6_1.resx">
+      <DependentUpon>Chapter6_1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BlockDiagram_Setup\Chapter6_3.resx">
+      <DependentUpon>Chapter6_3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BlockDiagram_Setup\Chapter6_4.resx">
+      <DependentUpon>Chapter6_4.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BlockDiagram_Setup\Chapter6_5.resx">
+      <DependentUpon>Chapter6_5.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CreateATTFiles.resx">
+      <DependentUpon>CreateATTFiles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DuplicateFile.resx">
+      <DependentUpon>DuplicateFile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="fLogin.resx">
+      <DependentUpon>fLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form5GAT.resx">
+      <DependentUpon>Form5GAT.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ISFreqRange.resx">
+      <DependentUpon>ISFreqRange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetupAttenuator.resx">
+      <DependentUpon>SetupAttenuator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetupBBU.resx">
+      <DependentUpon>SetupBBU.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetupRFSwitch.resx">
+      <DependentUpon>SetupRFSwitch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetupRRU.resx">
+      <DependentUpon>SetupRRU.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SetupVSA.resx">
+      <DependentUpon>SetupVSA.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="SetupVSG.resx">
+      <DependentUpon>SetupVSG.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\.DS_Store" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\.DS_Store" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Add Appointment.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Add Green Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Add To Favorite.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Add.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Appointment Cool.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Appointment Urgent.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Audio CD.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Audio Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Backup Green Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Bandwidth.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Blue Ball.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Cancel Red Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\CD.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Clear Green Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Coherence.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Desktop.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Discussion.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Donate.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Eject Blue Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Export To Audio Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Export To Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Export To Movie Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Export To Picture Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Favorite.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Forward Mail.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Fullscreen.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Gear Alt.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Gear.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Get Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Get Info Blue Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Get Info Purple Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Get Mail.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Green Ball.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Grey Ball.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Help Blue Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Help Purple Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\History.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\iChat Alt.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\iChat.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Import Audio Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Import Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Import Movie Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Import Picture Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Internet History.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Mail.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Menu Item.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Menu.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Minus Green Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Minus Red Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Movie CD.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Movie Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Mr. Bomb.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Network.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\New Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\New Mail.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Orange Ball.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Pause All.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Pause Blue Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Pause Green Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Pause.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Picture CD.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Picture Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Play All.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Play Blue Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Play Green Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Play.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Plugin Green Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Purple Ball.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Record Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Record Red Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Red Ball.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Remove Appointment.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Remove Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Remove.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Rename Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Run.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Send Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Send Mail.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Smiley Blue.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Smiley Sad Blue.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Smiley Sad.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Smiley Star Pink.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Smiley Star Sad.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Smiley Star.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Smiley.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Spotlight Blue Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Star.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Stop All.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Stop Green Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Stop Red Button.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Stop.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Terminal.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Transfer Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Transfer.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Trash Empty.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Trash Full.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Universal Binary.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Unread Mail Alt.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Unread Mail.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\User.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Users.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Web Browser.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Write Document.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICNS\Yellow Ball.icns" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\iContainer\#Developpers Icons.icontainer" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\iContainer\.DS_Store" />
+    <None Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\.DS_Store" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="VHT.5G.AUTOTOOL_TemporaryKey.pfx" />
+    <None Include="Views\Shared\Skeleton.Master" />
+    <None Include="Views\Shared\_Skeleton.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>9</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\ATT.PNG" />
+    <Content Include="Images\ATT1.png" />
+    <Content Include="Images\ATT2.png" />
+    <Content Include="Images\Chapter6.1.JPG" />
+    <Content Include="Images\Chapter6_1.JPG" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Add Appointment.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Add Green Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Add To Favorite.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Add.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Appointment Cool.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Appointment Urgent.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Audio CD.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Audio Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Backup Green Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Bandwidth.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Blue Ball.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Cancel Red Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\CD.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Clear Green Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Coherence.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Desktop.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Discussion.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Donate.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Eject Blue Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Export To Audio Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Export To Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Export To Movie Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Export To Picture Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Favorite.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Forward Mail.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Fullscreen.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Gear Alt.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Gear.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Get Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Get Info Blue Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Get Info Purple Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Get Mail.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Green Ball.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Grey Ball.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Help Blue Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Help Purple Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\History.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\iChat Alt.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\iChat.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Import Audio Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Import Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Import Movie Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Import Picture Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Internet History.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Mail.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Menu Item.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Menu.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Minus Green Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Minus Red Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Movie CD.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Movie Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Mr. Bomb.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Network.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\New Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\New Mail.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Orange Ball.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Pause All.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Pause Blue Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Pause Green Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Pause.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Picture CD.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Picture Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Play All.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Play Blue Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Play Green Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Play.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Plugin Green Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Purple Ball.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Record Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Record Red Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Red Ball.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Remove Appointment.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Remove Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Remove.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Rename Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Run.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Send Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Send Mail.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Smiley Blue.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Smiley Sad Blue.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Smiley Sad.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Smiley Star Pink.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Smiley Star Sad.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Smiley Star.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Smiley.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Spotlight Blue Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Star.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Stop All.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Stop Green Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Stop Red Button.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Stop.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Terminal.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Transfer Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Transfer.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Trash Empty.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Trash Full.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Universal Binary.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Unread Mail Alt.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Unread Mail.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\User.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Users.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Web Browser.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Write Document.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\ICO\Yellow Ball.ico" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\New folder\Grey Ball.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Add Appointment.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Add Green Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Add To Favorite.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Add.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Appointment Cool.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Appointment Urgent.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Audio CD.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Audio Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Backup Green Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Bandwidth.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Blue Ball.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Cancel Red Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\CD.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Clear Green Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Coherence.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Desktop.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Discussion.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Donate.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Eject Blue Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Export To Audio Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Export To Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Export To Movie Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Export To Picture Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Favorite.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Forward Mail.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Fullscreen.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Gear Alt.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Gear.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Get Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Get Info Blue Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Get Info Purple Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Get Mail.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Green Ball.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Grey Ball.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Help Blue Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Help Purple Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\History.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\iChat Alt.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\iChat.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Import Audio Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Import Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Import Movie Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Import Picture Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Internet History.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Mail.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Menu Item.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Menu.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Minus Green Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Minus Red Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Movie CD.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Movie Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Mr. Bomb.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Network.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\New Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\New Mail.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Orange Ball.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Pause All.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Pause Blue Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Pause Green Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Pause.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Picture CD.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Picture Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Play All.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Play Blue Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Play Green Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Play.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Plugin Green Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Purple Ball.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Record Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Record Red Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Red Ball.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Remove Appointment.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Remove Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Remove.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Rename Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Run.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Send Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Send Mail.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Smiley Blue.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Smiley Sad Blue.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Smiley Sad.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Smiley Star Pink.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Smiley Star Sad.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Smiley Star.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Smiley.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Spotlight Blue Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Star.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Stop All.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Stop Green Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Stop Red Button.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Stop.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Terminal.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Transfer Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Transfer.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Trash Empty.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Trash Full.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Universal Binary.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Unread Mail Alt.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Unread Mail.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\User.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Users.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Web Browser.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Write Document.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\#Developpers Icons\PNG\Yellow Ball.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\Green Ball.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\Grey Ball.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\Grey Ball1.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\Orange Ball.png" />
+    <Content Include="Images\developpers_icons_icons_pack_120568\Red Ball.png" />
+    <Content Include="Images\download.jpg" />
+    <Content Include="Images\download_1.ico" />
+    <Content Include="Xml\Downlink.xml" />
+    <Content Include="Xml\Uplink.xml" />
+    <EmbeddedResource Include="Images\Failed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <Content Include="Images\FSV13.PNG" />
+    <Content Include="Images\FSV3030.JPG" />
+    <Content Include="Images\FSV3030.png" />
+    <Content Include="Images\FSW26.jpg" />
+    <Content Include="Images\FSW26.png" />
+    <Content Include="Images\Giao dien he do.JPG" />
+    <Content Include="Images\iconfinder_PauseHot_22965.png" />
+    <Content Include="Images\iconfinder_Start_22935.png" />
+    <Content Include="Images\iconfinder_Start_22965.png" />
+    <Content Include="Images\iconfinder_Stop1NormalRed_22947.png" />
+    <Content Include="Images\keysight_e5071c_6.png" />
+    <Content Include="Images\LOGO.jpg" />
+    <Content Include="Images\N9020A.PNG" />
+    <Content Include="Images\N9030B.png" />
+    <EmbeddedResource Include="Images\Passed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\Pending.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Images\Na.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <Content Include="Images\PXI.png" />
+    <Content Include="Images\RFswitch.JPG" />
+    <Content Include="Images\RFswitch.png" />
+    <Content Include="Images\RRU5G.png" />
+    <Content Include="Images\RRU5G_horizontal.png" />
+    <EmbeddedResource Include="Images\Running.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <Content Include="Images\SMW200A.JPG" />
+    <Content Include="Images\SMW200A.png" />
+    <EmbeddedResource Include="Images\TestPlan.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <Content Include="Images\VHT.jpg" />
+    <Content Include="Images\VNA2.png" />
+    <Content Include="Images\VNA3.png" />
+    <Content Include="Images\VNA_E5071C_.png" />
+    <Content Include="Images\VSG2.png" />
+    <Content Include="Images\XeonGold1.jpg" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

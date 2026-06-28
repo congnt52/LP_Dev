@@ -1,0 +1,7 @@
+Điều khiển VSA N9020A cho bài đo TAE
+---------------------------------------
+1. File VSA recall: ":MMEM:LOAD:STAT " + "\"" + "D:/Users/Instrument/Documents/NR5G/state/NRTM/" + NRTMxx + "_7D1S2U" + ".state" + "\""
+2. Lấy giá trị trả về: READ:EVM? -> lấy giá trị trả về ở respone[6] - Time offset (Đơn vị là s)
+3. Sau khi có 32 giá trị của 32 port , tính độ lệch giữa giá trị min và max
+-> so sánh với giá trị chuẩn (đổi sang đơn vị us) để đánh giá Pass/Fail 
+4. Lưu log csv giá trị Time offset của 32 port 

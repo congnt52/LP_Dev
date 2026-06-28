@@ -1,0 +1,3364 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Windows.Forms;
+using Excel = Microsoft.Office.Interop.Excel;
+
+namespace _5GAutoTool
+{
+    /// <summary>
+    /// Giao diện chính Tool đo kiểm tự động
+    /// </summary>
+    [Guid("5BB4EA84-AD3E-4597-8A47-4D996AC0D3F2")]
+    public partial class Form5GAT : Form
+    {
+        public Form5GAT()
+        {
+            InitializeComponent();
+            BBU = new BBU(this);
+            RRU = new RRU(this);
+            VSA = new VSA(this);
+            VSG1 = new VSG(this);
+            VSG2 = new VSG(this);
+            VSG3 = new VSG(this);
+            PS = new PowerSensor(this);
+            rfSwitch1 = new RFSwitch(this);
+            rfSwitch2 = new RFSwitch(this);
+            rfSwitch3 = new RFSwitch(this);
+            Measurement = new Measurements1(this);
+
+            frmVSA = new SetupVSA(this);
+            frmVSG = new SetupVSG(this);
+            frmRFSwitch = new SetupRFSwitch(this);
+            frmAttenuator = new SetupAttenuator();
+            frmBBU = new SetupBBU(this);
+            frmRRU = new SetupRRU(this);
+
+            // Khai báo backgroundWorker
+            measurementBackgroundWorker = new BackgroundWorker();
+            measurementBackgroundWorker.WorkerSupportsCancellation = true; // cho phep dung tien trinh
+            measurementBackgroundWorker.WorkerReportsProgress = true; // cho phep bao cao tien trinh
+            measurementBackgroundWorker.DoWork += measurementBackgroundWorker_DoWork;
+            //  measurementBackgroundWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(measurementBackgroundWorker_Completed);
+
+        }
+
+        #region Declare variable
+        //Khai báo biến\
+        BBU BBU;
+        RRU RRU;
+        VSA VSA;
+        VSG VSG1, VSG2, VSG3;
+        PowerSensor PS;
+        Measurements1 Measurement;
+
+        RFSwitch rfSwitch1, rfSwitch2, rfSwitch3;
+        SetupVSA frmVSA;
+        SetupVSG frmVSG;
+        SetupAttenuator frmAttenuator;
+        SetupRFSwitch frmRFSwitch;
+        SetupBBU frmBBU;
+        SetupRRU frmRRU;
+        public BackgroundWorker measurementBackgroundWorker;
+        UploadFIle uploadtoServer = new UploadFIle();
+
+        //CONFIGURATION
+        string setFrequency, setPower, setBandwidth;
+        string instrBBU, ipBBU, userBBU, passBBU;
+        string rruSerial = ""; // thông tin RRU
+        bool[] setPort = new bool[32];   //kiểm tra lại khai báo mảng này
+        string fileReport = "";
+
+        string[] getSN = new string[6];
+        string[] readSN = new string[6];
+        Result getresult;
+        string pass = "PASS";
+        string fail = "FAIL";
+        string error = "ERROR";
+        string taetmp = "ERROR";
+
+        //INSTRUMENT
+        string statusVSA = "";
+        string statusVSG1 = "";
+        string statusVSG2 = "";
+        string statusVSG3 = "";
+        string statusRFS = "";
+        string statusRRU = "";
+        string statusBBU = "";
+        string ipVSA, ipRFS1, ipRFS2, ipRFS3, ipRRU, ipVSG1, ipVSG2, ipVSG3;
+        string[] arrAttDL = new string[32];
+        string[] arrAttUL = new string[32];
+        string attIMD = "", attIMD1 = "";
+        string attOnOff = "";
+        string testingMode = "TX";
+
+
+        string rfs1Ax, rfs2Ax, rfs3Ax;
+
+        //TreeView_Cac bai do
+        string[,] loadExcelClause = new string[50, 20];
+        string[,] measClause = new string[50, 20];
+        int numberMeasClause = 0; // số bài đo đã chọn
+        int numberPortChecked = 0; // số Port đã chọn
+        int count = 0; // số mục đã đo;
+        int time = 0;
+        //string beginningTime = "";
+        string endingTime = "";
+        //Data_Cac bai do 
+        // data downlink
+        string[,] dataCalibTx = new string[32, 5];
+        string[,] dataPout = new string[32, 3];  // 8 port || 0 Result, 1 Testing Time, 2 Read Value.
+        string[,] dataOBW = new string[32, 3];
+        string[,,] dataACLR = new string[32, 2, 3];
+        string[,,] dataSEM = new string[32, 2, 5];
+        string[,,] dataEVM = new string[32, 6, 3];
+        string[,,] dataFreqErr = new string[32, 6, 3];
+        string[,] dataTotalDR = new string[32, 3];
+        string[,] dataTXSUPR = new string[32, 7]; // 8 port || 0 Result, 1 testing time, 2 read value 1, 3 read value 2, 4 read value 3, 5 read value 4, 6 read value 5
+        string[,] dataOnOffPower = new string[32, 3];
+        string[,] dataTransient = new string[32, 3];
+        string[,] dataTAE = new string[32, 3];
+        // data uplink
+        string[] dataCalibRx = new string[5];
+        string[,] dataPsen = new string[32, 4];     // 8 port || 0 PASS/FAIL, 1 testing time, 2 throughPut, 3 Testing Power
+        string[,] dataDR = new string[32, 4];       // 8 port || 0 PASS/FAIL, 1 testing time, 2 throughPut, 3 Testing Power
+        string[,] dataICS = new string[32, 4];  // 8 port  || 0 PASS/FAIL, 1 testing time, 2 throughPut, 3 Testing Power
+        string[,,] dataACS = new string[32, 2, 4];  // 8 port  || 0 PASS/FAIL, 1 testing time, 2 throughPut, 3 Testing Power
+        string[,,] dataINB = new string[32, 2, 4];  // 8 port  || 0 PASS/FAIL, 1 testing time, 2 throughPut, 3 Testing Power
+        string[,,] dataNBB = new string[32, 2, 4];  // 8 port  || 0 PASS/FAIL, 1 testing time, 2 throughPut, 3 Testing Power
+        string[,,] dataOBB = new string[32, 2, 4];  // 8 port  || 0 PASS/FAIL, 1 testing time, 2 throughPut, 3 Testing Power
+        string[,] dataRXSUPR = new string[32, 5];
+        string[,,,] dataRXIMD = new string[2, 32, 2, 4];
+
+        // flag event
+        bool clearFlag = false;
+        #endregion
+        string directionPathTemplate = @"C:\test3gpp\OQC\32T32R10W\templates\";
+        string directionPathLogs = @"C:\test3gpp\OQC\32T32R10W\logs\";
+        string directionPathResults = @"C:\test3gpp\OQC\32T32R10W\results\";
+        #region button event cick
+        string ruIP = "192.168.120.3";
+        string ruUser = "root";
+        string ruPW = "root";
+        bool ruConflag = false;
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            rruSerial = txtRRUSerial.Text;
+            frmBBU.infor(out instrBBU, out ipBBU, out port, out userBBU, out passBBU);
+            BBU.loginOAM(ipBBU, port, out flagConnectedtoOAM);
+            if (flagConnectedtoOAM)
+            {
+                LogText($@"Socket connected to {ipBBU}");
+            }
+            if (rruSerial.Contains("RU") || rruSerial.Contains("AIO")) //&& rruSerial.Length == 10
+            {
+                if (txtStation.Text == "" || txtTestName.Text == "")
+                {
+                    MessageBox.Show("Vui lòng nhập thông tin trạm đo và người đo kiểm", "Thông báo");
+                }
+                else
+                {
+                    Config();
+                    Measurement.Reset();
+                    if (numberMeasClause != 0 && numberPortChecked != 0)
+                    {
+                        if (clearFlag)
+                        {
+                            DialogResult deleteResult = MessageBox.Show("Xóa dữ liệu hiển thị trên màn hình ?", "Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                            if (deleteResult == DialogResult.Yes)
+                            {
+                                ClearResult();
+                            }
+                            clearFlag = false;
+                        }
+                        rruSerial = txtRRUSerial.Text;
+                        if (measurementBackgroundWorker.IsBusy)
+                        {
+                            measurementBackgroundWorker.CancelAsync();
+                            measurementBackgroundWorker.RunWorkerAsync();
+                        }
+                        else
+                        {
+                            measurementBackgroundWorker.RunWorkerAsync();
+
+                        }
+                        timerProcess.Start();
+                        btnStop.Enabled = true;
+                        prgLoad_ValueChange(numberPortChecked * numberMeasClause, 0);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Chưa chọn port hoặc chỉ tiêu cần đo", "Thông báo", MessageBoxButtons.OK);
+                    }
+                }
+            }
+            else
+            {
+                DialogResult deleteResult = MessageBox.Show("Mã Scan sai định dạng hoặc đang bỏ trống");
+                txtRRUSerial.Text = "";
+            }
+        }
+        public void btnStop_Click(object sender, EventArgs e)
+        {
+            clearFlag = true;
+            if (measurementBackgroundWorker.IsBusy == true)
+            {
+                measurementBackgroundWorker.CancelAsync();
+            }
+            timerProcess.Stop();
+            btnConnect_Enable();
+            lblStatusProgress_TextChanged("Đã dừng");
+        }
+        bool rfsFlagconnect = false, rruSync = false, duSync = false, sync = false, statusConnection = false, flagConnectedtoOAM = false;
+        int port = 1970, portRFS = 0;
+        string manufacturerVSA = "", instrVSA = "", modelVSA = "", serialVSA = "";
+        private void btnConnect_Click(object sender, EventArgs e)
+        {
+            frmBBU.infor(out instrBBU, out ipBBU, out port, out userBBU, out passBBU);
+            BBU.loginOAM(ipBBU, port, out flagConnectedtoOAM);
+            if (flagConnectedtoOAM)
+            {
+                LogText($@"Socket connected to {ipBBU}");
+                BBU.StopProcess();
+                int sync_cpri = BBU.check_CPRI_SYNC();
+                if (sync_cpri == 1)
+                {
+                    lblStatusProgress.Text = "Chưa đồng bộ";
+                }
+                else
+                {
+
+                    lblStatusProgress.Text = "Đã đồng bộ";
+                    btnConnect.Enabled = false;
+                }
+            }
+            else
+            {
+                LogText("Connection refuse: Please run !!" + "\n" + "/nr_sw/running/scripts/sw_start.sh)");
+            }
+            if (testingMode == "TX")
+            {
+                frmVSA.info(out instrVSA, out ipVSA);
+                if (manufacturerVSA == "")
+                {
+                    VSAConnection(ipVSA, "*IDN?", instrVSA, out manufacturerVSA, out modelVSA, out serialVSA);
+                    if (manufacturerVSA == "Rohde&Schwarz") { frmVSA.statusConnection(manufacturerVSA, modelVSA, serialVSA); }
+                    else if (manufacturerVSA == "Agilent Technologies") { frmVSA.statusConnection(manufacturerVSA, modelVSA, serialVSA); }
+                }
+            }
+            else if (testingMode == "RX")
+            {
+
+            }
+        }
+
+        private void btnAttenuator_Click(object sender, EventArgs e)
+        {
+            frmAttenuator.ShowDialog();
+        }
+        #endregion
+        public void ClearResult()
+        {
+            lvwResult.Items.Clear();
+            count = 0;
+            prgLoad_ValueChange(1000, 0);
+            timerProcess.Stop();
+            time = 0;
+            TimeSpan timeCount = TimeSpan.FromSeconds(time);
+            lblRuntime.Text = timeCount.ToString();
+
+            // xoa gia tri o mang cu
+
+            dataCalibTx = new string[32, 5];
+            dataPout = new string[32, 3];  // 8 port || 0 Result, 1 Testing Time, 2 Read Value.
+            dataOBW = new string[32, 3];
+            dataACLR = new string[32, 2, 3];
+            dataSEM = new string[32, 2, 5];
+            dataEVM = new string[32, 6, 3];
+            dataFreqErr = new string[32, 6, 3];
+            dataTotalDR = new string[32, 3];
+            dataTXSUPR = new string[32, 7];
+
+            dataPsen = new string[32, 4];     // 8 port || 0 PASS/FAIL, 1 testing time, 2 throughPut, 3 Testing Power
+            dataDR = new string[32, 4];       // 8 port || 0 power, 1 PASS/FAIL, 2 tp
+            dataICS = new string[32, 4];  // 8 port  || 0 lower , 1 upper || 0 power, 1 PASS/FAIL, 2 tp
+            dataACS = new string[32, 2, 4];  // 8 port  || 0 lower , 1 upper || 0 power, 1 PASS/FAIL, 2 tp
+            dataINB = new string[32, 2, 4];  // 8 port  || 0 lower , 1 upper || 0 power, 1 PASS/FAIL, 2 tp
+            dataNBB = new string[32, 2, 4];  // 8 port  || 0 lower , 1 upper || 0 power, 1 PASS/FAIL, 2 tp
+            dataOBB = new string[32, 2, 4];  // 8 port  || 0 lower , 1 upper || 0 power, 1 PASS/FAIL, 2 tp
+            dataRXSUPR = new string[32, 5];
+            dataRXIMD = new string[2, 32, 2, 4];
+        }
+        public void Config()
+        {
+            btnStart.Enabled = true;
+            timerProcess.Stop();
+            time = 0;
+            numberMeasClause = 0;
+            numberPortChecked = 0;
+            prgLoad_ValueChange(1000, 0);
+            count = 0;
+            VSA.RRUinfo(rruSerial);
+
+            //...............................info RRU
+
+            Measurement.Reset();
+            TimeSpan timeCount = TimeSpan.FromSeconds(time);
+            lblRuntime.Text = timeCount.ToString();
+            setFrequency = Convert.ToString((double.Parse(txtFrequency.Text) * 1000000));    // chuyen doi frequency tu MHz sang Hz
+            setPower = txtPWR.Text;
+            setBandwidth = textBandwidth.Text;
+            for (int i = 0; i < 32; i++)
+            {
+                string chkPortIndex = "chkPort" + (i + 1);
+                CheckBox checkbox = (CheckBox)this.Controls.Find(chkPortIndex, true)[0];
+                setPort[i] = checkbox.Checked;
+                if (checkbox.Checked)
+                {
+                    numberPortChecked++;
+                }
+            }
+            frmRFSwitch.RFSwitchSetup(out rfs1Ax, out rfs2Ax, out rfs3Ax);
+            Array.Clear(measClause, 0, measClause.Length);
+            try
+            {
+                int l = 0, m = 0;
+                foreach (TreeNode node in trvTestCases.Nodes)
+                {
+                    if (node.Checked)
+                    {
+                        foreach (TreeNode childnode in node.Nodes)
+                        {
+                            if (childnode.Checked)
+                            {
+
+                                Console.WriteLine(childnode.Text);
+                                for (int i = 0; i < loadExcelClause.GetLength(0); i++)
+                                {
+                                    if (loadExcelClause[i, 0] != null)
+                                    {
+                                        for (int j = 0; j < loadExcelClause.GetLength(1); j++)
+                                        {
+                                            if (loadExcelClause[i, j] == childnode.Text)
+                                            {
+                                                measClause[l, m] = loadExcelClause[i, j];
+                                                measClause[l, m + 1] = loadExcelClause[i, j + 1];
+                                                measClause[l, m + 2] = loadExcelClause[i, j + 2];
+                                                measClause[l, m + 3] = loadExcelClause[i, j + 3];
+                                                measClause[l, m + 4] = loadExcelClause[i, j + 4];
+                                                measClause[l, m + 5] = loadExcelClause[i, j + 5];
+                                                measClause[l, m + 6] = loadExcelClause[i, j + 6];
+                                                measClause[l, m + 7] = loadExcelClause[i, j + 7];
+                                                measClause[l, m + 8] = loadExcelClause[i, j + 8];
+                                                measClause[l, m + 8] = loadExcelClause[i, j + 8];
+                                                measClause[l, m + 9] = loadExcelClause[i, j + 9];
+                                                measClause[l, m + 10] = loadExcelClause[i, j + 10];
+                                                measClause[l, m + 11] = loadExcelClause[i, j + 11];
+                                                measClause[l, m + 12] = loadExcelClause[i, j + 12];
+                                                measClause[l, m + 13] = loadExcelClause[i, j + 13];
+                                                l++;
+                                                m = 0;
+                                                numberMeasClause++;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                bool haveSwap = false;
+                for (int i = 0; i < l - 1; i++)
+                {
+                    for (int j = 0; j < l - i - 1; j++)
+                    {
+                        if (Convert.ToInt32(measClause[j, 19]) > Convert.ToInt32(measClause[j + 1, 19]))
+                        {
+                            Swap(measClause, j);
+                            haveSwap = true;
+                        }
+                    }
+                    if (haveSwap == false)
+                    {
+                        break;
+                    }
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Load Clause : Fail");
+            }
+        }
+        // PICTURE CLICK==========================================
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="max"></param>
+        /// <param name="value"></param>
+        // VALUE CHANGED EVENT ======================================
+
+        // Loading Progress Bar
+        //
+        public void prgLoad_ValueChange(int max, int value)
+        {
+            ProgressBar status = proLoad;
+            status.Invoke(new MethodInvoker(delegate ()
+            {
+                if (value <= max)
+                {
+                    proLoad.Maximum = max;
+                    proLoad.Minimum = 0;
+                    proLoad.Value = value;
+                }
+                else
+                {
+                    value = 0;
+                }
+            }));
+        }
+        private void lblStatusProgress_TextChanged(string text)
+        {
+            Label status = lblStatusProgress;
+            status.Invoke(new MethodInvoker(delegate ()
+            {
+                lblStatusProgress.Text = text;
+            }));
+        }
+        private void txtSerial_TextChanged(string text)
+        {
+            Label status = lblStatusProgress;
+            status.Invoke(new MethodInvoker(delegate ()
+            {
+                txtRRUSerial.Text = text;
+            }));
+        }
+        private void btnConnect_Enable()
+        {
+            Button status = btnConnect;
+            status.Invoke(new MethodInvoker(delegate ()
+            {
+                btnConnect.Enabled = true;
+            }));
+        }
+        //
+        // ALLPORT checked / unchecked Event
+        //
+        private void chkAllPort_CheckedChanged(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 32; i++)  // Loop from chkPort1->8
+            {
+                string chkboxIndex = "chkPort" + (i + 1);
+                CheckBox checkbox = (CheckBox)this.Controls.Find(chkboxIndex, true)[0];
+                checkbox.Checked = chkALL.Checked;
+            }
+        }
+        //
+
+        //==========================================================================
+
+        //++++++++++++++++++++ TOOLSTRIP MENU ITEMS ++++++++++++++++++++++++++++++++
+
+        // File -> Load
+        //
+        private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string filename = directionPathTemplate + "OQC_DL_SETUP_3GPP.xlsx";
+            clTmp.Text = "NRTM";
+            testingMode = "TX";
+            OpenFileData(filename);
+        }
+        private void tsmUL_Click(object sender, EventArgs e)
+        {
+            string filename = directionPathTemplate + "OQC_UL_SETUP_3GPP.xlsx";
+            clTmp.Text = "ThoughPut";
+            testingMode = "RX";
+            OpenFileData(filename);
+        }
+        public void OpenFileData(string filename)
+        {
+            //try
+            //{
+            //// Open file bai do
+            string content = "";
+            Excel.Application xlApp = new Excel.Application();
+            Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(filename);
+            Excel._Worksheet xlWorksheet = xlWorkbook.Sheets[1];
+            Excel.Range xlRange = xlWorksheet.UsedRange;
+            int rowCount = xlRange.Rows.Count;
+            int colCount = xlRange.Columns.Count;
+            //Load noi dung bai do tu file excel vao mang loadExcel
+            Array.Clear(loadExcelClause, 0, loadExcelClause.Length);
+            for (int i = 2; i <= rowCount; i++)
+            {
+                if (xlRange.Cells[i, 1].Value != null)
+                {
+                    content += xlRange.Cells[i, 1].Value.ToString() + '\n';
+                }
+                for (int j = 1; j <= 14; j++)
+                {
+                    if (xlRange.Cells[i, 1].Value != null && xlRange.Cells[i, j].Value != null)
+                    {
+                        string str = xlRange.Cells[i, j].Value.ToString();
+                        loadExcelClause[i - 1, j - 1] = str;
+                    }
+                }
+            }
+
+
+            for (int i = 0; i < 8; i++)
+            {
+                if (filename.Contains("DL"))
+                {
+                    arrAttDL[i] = xlRange.Cells[2, 14 + i].Value.ToString();
+                    arrAttDL[i + 8] = xlRange.Cells[4, 14 + i].Value.ToString();
+                    arrAttDL[i + 16] = xlRange.Cells[6, 14 + i].Value.ToString();
+                    arrAttDL[i + 24] = xlRange.Cells[8, 14 + i].Value.ToString();
+                    LogText("ATT Port" + (i + 1) + ": " + arrAttDL[i]);
+                    LogText("ATT Port" + (i + 9) + ": " + arrAttDL[i + 8]);
+                    LogText("ATT Port" + (i + 17) + ": " + arrAttDL[i + 16]);
+                    LogText("ATT Port" + (i + 25) + ": " + arrAttDL[i + 24]);
+                    attIMD = xlRange.Cells[2, 14 + 8].Value.ToString();
+                    attIMD1 = xlRange.Cells[2, 14 + 9].Value.ToString();
+                    attOnOff = xlRange.Cells[2, 14 + 10].Value.ToString();
+                }
+
+                if (filename.Contains("UL"))
+                {
+                    arrAttUL[i] = xlRange.Cells[2, 15 + i].Value.ToString();
+                    arrAttUL[i + 8] = xlRange.Cells[4, 15 + i].Value.ToString();
+                    arrAttUL[i + 16] = xlRange.Cells[6, 15 + i].Value.ToString();
+                    arrAttUL[i + 24] = xlRange.Cells[8, 15 + i].Value.ToString();
+                    LogText("ATT Port" + (i + 1) + ": " + arrAttUL[i]);
+                    LogText("ATT Port" + (i + 9) + ": " + arrAttUL[i + 8]);
+                    LogText("ATT Port" + (i + 17) + ": " + arrAttUL[i + 16]);
+                    LogText("ATT Port" + (i + 25) + ": " + arrAttUL[i + 24]);
+                }
+            }
+            frmAttenuator.attSetup(arrAttDL, arrAttUL, attIMD, attIMD1);
+            // Xu ly noi dung tren Treeview
+            trvTestCases.Nodes.Clear();
+            string file_contents = content;
+            //Console.WriteLine(content);
+            string[] lines = file_contents.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            int node, root;
+            Dictionary<int, TreeNode> parents = new Dictionary<int, TreeNode>();
+            foreach (string text_line in lines)
+            {
+                // See how many tabs are at the start of the line.
+                int level = text_line.Length - text_line.TrimStart('+').Length;
+                node = level;
+                root = level - 1;
+                // Add the new node.
+                if (level == 0)
+                {
+                    parents[level] = trvTestCases.Nodes.Add(text_line.Trim());
+                }
+                else
+                {
+                    parents[level] = parents[level - 1].Nodes.Add(text_line.Trim());
+                }
+                parents[level].EnsureVisible();
+                parents[level].Checked = true;
+            }
+            if (trvTestCases.Nodes.Count > 0)
+                trvTestCases.Nodes[0].EnsureVisible();
+
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(xlApp);
+            System.Diagnostics.Process[] process = System.Diagnostics.Process.GetProcessesByName("Excel");
+            foreach (System.Diagnostics.Process p in process)
+            {
+                if (!string.IsNullOrEmpty(p.ProcessName))
+                {
+                    try
+                    {
+                        p.Kill();
+                    }
+                    catch { }
+                }
+            }
+            Console.WriteLine("Load Setup File: " + filename);
+            //}
+            //catch(Exception e)
+            //{
+            //    Console.WriteLine("Load Setup File: FAIL");
+            //}
+        }
+
+        //
+        // File -> Exit
+        //
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+        //
+        // INSTRUMENT -> VSA
+        //
+        private void VSAToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmVSA.flagConn(statusVSA);
+            frmVSA.ShowDialog();
+            frmVSA.StatusConnection(out ipVSA, out statusVSA);
+        }
+        //
+        // INSTRUMENT -> VSG
+        //
+        private void VSGToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmVSG.flagConn1(statusVSG1);
+            frmVSG.flagConn2(statusVSG2);
+            frmVSG.flagConn3(statusVSG3);
+            frmVSG.ShowDialog();
+            frmVSG.StatusConnection1(out ipVSG1, out statusVSG1);
+            frmVSG.StatusConnection2(out ipVSG2, out statusVSG2);
+            frmVSG.StatusConnection3(out ipVSG3, out statusVSG3);
+        }
+        //
+        // INSTRUMENT -> RFSWITCH
+        //
+        private void RFSwitchToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmRFSwitch.ShowDialog();
+            //  frmRFSwitch.StatusConnection(out ipRFS, out statusRFS);
+        }
+        //
+        // INSTRUMENT -> ATTENUATOR
+        //
+        private void AttenuatorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmAttenuator.ShowDialog();
+        }
+
+        //==========================================================================
+
+        //++++++++++++++++++++ TREVIEW MENU ITEMS ++++++++++++++++++++++++++++++++
+
+        //treeView1_NodeMouseClick 
+        //
+        void trvTestCases_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if (e.Node.Name == "6.1")
+            {
+                Chapter6_1 n = new Chapter6_1();
+                n.ShowDialog();
+            }
+        }
+
+        public void LoadVSGSetup(string powervsg, string freqvsg)
+        {
+            //VSG2.SetICSWaveform(powervsg, freqvsg);
+            VSG2.SetACSWaveform(powervsg, freqvsg);
+        }
+
+        private void HelpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // mở file theo đường dẫn
+            string filename = directionPathTemplate + "Autotool_manual.doc";
+            Process.Start(filename);
+        }
+
+        //
+        //treeView1_AfterCheck
+        //
+        void trvTestCases_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            if (e.Action != TreeViewAction.Unknown)
+            {
+                if (e.Node.Nodes.Count > 0)
+                {
+                    /* Calls the CheckAllChildNodes method, passing in the current 
+
+                    Checked value of the TreeNode whose checked state changed. */
+                    this.CheckAllChildNodes(e.Node, e.Node.Checked);
+                }
+            }
+            SelectParents(e.Node, e.Node.Checked);
+        }
+
+        //
+        //CheckAllChildNodes
+        //
+        private void CheckAllChildNodes(TreeNode treeNode, bool nodeChecked)
+        {
+            foreach (TreeNode node in treeNode.Nodes)
+            {
+                node.Checked = nodeChecked;
+
+                if (node.Nodes.Count > 0)
+                {
+                    // If the current node has child nodes, call the CheckAllChildsNodes method recursively.
+                    this.CheckAllChildNodes(node, nodeChecked);
+                }
+            }
+        }
+
+        //
+        //SelectParents
+        //
+        private void SelectParents(TreeNode node, Boolean isChecked)
+        {
+            var parent = node.Parent;
+
+            if (parent == null)
+                return;
+            if (!isChecked && HasCheckedNode(parent))
+                return;
+            parent.Checked = isChecked;
+            SelectParents(parent, isChecked);
+        }
+        //
+        //HasCheckedNode
+        private bool HasCheckedNode(TreeNode node)
+        {
+            return node.Nodes.Cast<TreeNode>().Any(n => n.Checked);
+        }
+        //
+
+        //==========================================================================
+
+        //++++++++++++++++++ BACKGROUND WORKER +++++++++++++++++++++++++++++++++++++
+
+        //measurementBackgroundWorker_DoWork
+        //
+        public void measurementBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            // in put
+            string PassFail = fail;
+            string[] Result = new string[5];
+            double[] dbRS = new double[4];
+            double limitMin = 0;
+            double limitMax = 0;
+            string result = "";
+            double tp = 0;
+            double RS = 0;
+            string switchRF = "";
+            bool flag = true;
+            bool flagsetuprx = false;
+            string mode = "";
+            string note = "";
+            string loadBlock = "1";
+            // out put
+            string[] transPeriod = new string[32];
+            string aclrAdjLower = "";
+            string aclrAdjUpper = "";
+            string aclrAlt1Lower = "";
+            string aclrAlt1Upper = "";
+            string[] evm = new string[13];
+            string[,] freqError = new string[32, 6];
+            string[] taeMeas = new string[32];
+            string[] tse = new string[9];
+            double[] imdACLR = new double[6];
+            double[] imdSEM = new double[6];
+            double[,] imdTSE = new double[6, 6];
+            string[,] OFDM = new string[32, 6];
+            string[,] Transient = new string[32, 6];
+            string[] noise = new string[32];
+            string respond = "";
+            int loopTime = 3;
+            int timeout = 0;
+            //BBU.CHG_Freq(setFrequency);
+            //BBU.TDD_MODE("CALIB");
+            for (int i = 0; i < numberMeasClause; i++) //    measClause.GetLength(0)    
+            {
+                if (measurementBackgroundWorker.CancellationPending) return;
+                System.Threading.Thread.Sleep(1);
+                if (measClause[i, 0] != null)
+                {
+                    for (int j = 0; j < setPort.Length; j++)
+                    {
+                        while (timeout < loopTime)
+                        {
+                            bool reTest = false;// Switch den port Nx
+                            if (setPort[j]) // checking Port J is checked or not , if Port J is checked the return value is true
+                            {
+                                if (j < setPort.Length)
+                                {
+                                    if (j < 16)
+                                    {
+                                        // Su dung rfSwitch 2 do tu Tx1 - Tx16
+                                        rfSwitch2.SetSwitch(rfs2Ax, "N" + (j + 1), out respond);
+                                    }
+                                    else
+                                    {
+                                        // Su dung rfSwtich 3 do tu Tx17 - Tx32
+                                        rfSwitch3.SetSwitch(rfs3Ax, "N" + (j - 15), out respond);
+                                    }
+                                }
+                                if (measClause[i, 0] == "+ TX Calibration")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    if (j < 16)
+                                    {
+                                        rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond);
+                                    }
+                                    else
+                                    {
+                                        rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond);
+                                    }
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    string gainDefault = measClause[i, 5];
+                                    string powerExpected = txtPower.Text;
+                                    limitMax = double.Parse(powerExpected) + 0.5;
+                                    limitMin = double.Parse(powerExpected) - 0.5;
+                                    mode = "NRTM_11";
+                                    Measurement.calibTX(VSA, BBU, RRU, (j + 1).ToString(), mode, arrAttDL[j], setFrequency, gainDefault, powerExpected, out Result[0], out Result[1], out Result[2]);
+                                    bool isSuccess = double.TryParse(Result[0], out RS);
+                                    string gain = "";
+                                    BBU.SHW_TX_GAIN((j + 1).ToString(), out gain);
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Round(RS, 1);
+                                        if ((RS < limitMin || RS > limitMax))
+                                        {
+
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+
+                                            PassFail = pass;
+
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                        BBU.PREPARE_CALIB_RRU((j + 1).ToString(), gainDefault);
+                                    }
+                                    BBU.CHG_RRU_POWER(1000);
+                                    LogText("TRX" + (j + 1) + " Power : vsa reading " + RS + "dBm"); //+ " rru reading " + antPower + "dBm"
+                                    dataCalibTx[j, 0] = measClause[i, 2]; // 0 Min limit, 1 Reading Value, 2 Max limit, 3 Testing Time, 4 Result. 
+                                    dataCalibTx[j, 1] = result;     // 1 Reading Value
+                                    dataCalibTx[j, 2] = measClause[i, 3]; // 2 Max limit
+                                    dataCalibTx[j, 3] = DateTime.Now.ToString("hh:mm:ss");
+                                    dataCalibTx[j, 4] = PassFail;
+                                }
+                                #region Downlink 
+                                if (measClause[i, 0] == "+ Base station output power")
+                                {
+                                    BBU.CHG_RRU_POWER(int.Parse(setPower));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (j < 16)
+                                    {
+                                        rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond);
+                                    }
+                                    else
+                                    {
+                                        rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond);
+                                    }
+                                    double tmp1 = 0;
+                                    double.TryParse(txtPower.Text, out tmp1);
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    limitMax = tmp1 + 2;
+                                    limitMin = tmp1 - 2;
+                                    mode = "NRTM_11";
+                                    Measurement.Output5G(VSA, BBU, mode, arrAttDL[j], (j+1), setFrequency, setPower, setBandwidth, out Result[0]);
+                                    bool isSuccess = double.TryParse(Result[0], out RS);
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Round(RS, 1);
+                                        if (RS < limitMin || RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+
+                                            PassFail = pass;
+
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataPout[j, 0] = PassFail;  // 4 Result
+                                    dataPout[j, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataPout[j, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Occupied bandwidth")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (j < 16)
+                                    {
+                                        rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond);
+                                    }
+                                    else
+                                    {
+                                        rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond);
+                                    }
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    limitMin = 0;
+                                    mode = "NRTM_11";
+                                    Measurement.OBW5G(VSA, BBU, mode, arrAttDL[j], (j + 1), setFrequency, setBandwidth, out Result[0]);
+                                    double tmp;
+                                    bool isSuccess = double.TryParse(Result[0], out tmp);
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Abs(tmp / 1000000);
+                                        RS = Math.Round(RS, 1);
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+
+                                            PassFail = pass;
+
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataOBW[j, 0] = PassFail;  // 4 Result
+                                    dataOBW[j, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataOBW[j, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Adjacent channel leakage power TM1.1")
+                                {
+                                    //BBU.CHG_RRU_POWER(int.Parse(setPower));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    if (j < 16)
+                                    {
+                                        rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond);
+                                    }
+                                    else
+                                    {
+                                        rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond);
+                                    }
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    mode = "NRTM_11";
+                                    Measurement.ACLRPower5G(VSA, BBU, mode, arrAttDL[j], (j +1), setFrequency, setPower, setBandwidth, out Result[1], out aclrAdjLower, out aclrAdjUpper, out aclrAlt1Lower, out aclrAlt1Upper);
+                                    double tmp; // Biến chứa giá trị kết quả khi ép kiểu thành công
+                                    bool isSuccess = double.TryParse(aclrAdjLower, out tmp);
+                                    if (isSuccess)
+                                    {
+                                        double tmp1, tmp2, tmp3, tmp4, tmp5, tmp6;
+                                        double.TryParse(aclrAdjLower, out tmp1);
+                                        double.TryParse(aclrAdjUpper, out tmp2);
+                                        double.TryParse(aclrAlt1Lower, out tmp3);
+                                        double.TryParse(aclrAlt1Upper, out tmp4);
+                                        tmp5 = Math.Max(tmp1, tmp2);
+                                        tmp6 = Math.Max(tmp3, tmp4);
+                                        RS = Math.Abs(Math.Max(tmp5, tmp6));
+                                        RS = Math.Round(RS, 1);
+                                        if (RS < limitMin)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataACLR[j, 0, 0] = PassFail;  // 4 Result
+                                    dataACLR[j, 0, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataACLR[j, 0, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Adjacent channel leakage power TM1.2")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (j < 16)
+                                    {
+                                        rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond);
+                                    }
+                                    else
+                                    {
+                                        rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond);
+                                    }
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    mode = "NRTM_12";
+                                    Measurement.ACLRPower5G(VSA, BBU, mode, arrAttDL[j], (j +1), setFrequency, setPower, setBandwidth, out Result[1], out aclrAdjLower, out aclrAdjUpper, out aclrAlt1Lower, out aclrAlt1Upper);
+                                    double tmp; // Biến chứa giá trị kết quả khi ép kiểu thành công
+                                    bool isSuccess = double.TryParse(aclrAdjLower, out tmp);
+                                    if (isSuccess)
+                                    {
+                                        double tmp1, tmp2, tmp3, tmp4, tmp5, tmp6;
+                                        double.TryParse(aclrAdjLower, out tmp1);
+                                        double.TryParse(aclrAdjUpper, out tmp2);
+                                        double.TryParse(aclrAlt1Lower, out tmp3);
+                                        double.TryParse(aclrAlt1Upper, out tmp4);
+                                        tmp5 = Math.Max(tmp1, tmp2);
+                                        tmp6 = Math.Max(tmp3, tmp4);
+                                        RS = Math.Abs(Math.Max(tmp5, tmp6));
+                                        RS = Math.Round(RS, 1);
+                                        if (RS < limitMin)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataACLR[j, 1, 0] = PassFail;  // 4 Result
+                                    dataACLR[j, 1, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataACLR[j, 1, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Operating band Unwanted emissions TM1.1")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    mode = "NRTM_11";
+                                    Measurement.SEM5G(VSA, BBU, mode, arrAttDL[j], (j+1), setFrequency, setPower, setBandwidth, out dbRS[1], out dbRS[2], out dbRS[3], out dbRS[0]);
+                                    RS = Math.Round(dbRS[0], 1);
+                                    if (RS > limitMax)
+                                    {
+                                        //getresult.passfail = false;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    else
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    result = RS.ToString();
+                                    dataSEM[j, 0, 0] = PassFail;
+                                    dataSEM[j, 0, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataSEM[j, 0, 2] = Math.Round(dbRS[1], 1).ToString();
+                                    dataSEM[j, 0, 3] = Math.Round(dbRS[2], 1).ToString();
+                                    dataSEM[j, 0, 4] = Math.Round(dbRS[3], 1).ToString();
+                                }
+                                else if (measClause[i, 0] == "+ Operating band Unwanted emissions TM1.2")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    mode = "NRTM_12";
+                                    Measurement.SEM5G(VSA, BBU, mode, arrAttDL[j], (j+1), setFrequency, setPower, setBandwidth, out dbRS[1], out dbRS[2], out dbRS[3], out dbRS[0]);
+                                    RS = Math.Round(dbRS[0], 1);
+                                    if (RS > limitMax)
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    else
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    result = RS.ToString();
+                                    dataSEM[j, 1, 0] = PassFail;
+                                    dataSEM[j, 1, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataSEM[j, 1, 2] = dbRS[1].ToString();
+                                    dataSEM[j, 1, 3] = dbRS[2].ToString();
+                                    dataSEM[j, 1, 4] = dbRS[3].ToString();
+                                }
+                                else if (measClause[i, 0] == "+ Modulation quality TM2.0")
+                                {
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    mode = "NRTM_20";
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    Measurement.EVMFreqErr5G(VSA, BBU, mode, arrAttDL[j], (j+1), setFrequency, setPower, setBandwidth, out evm, out Result[0]);
+                                    dataFreqErr[j, 0, 0] = Result[0];
+                                    bool isSuccess = double.TryParse(evm[2], out RS); //evm[3] giá trị EVM 256QAM
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Round(RS, 1);
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataEVM[j, 0, 0] = PassFail;  // 4 Result
+                                    dataEVM[j, 0, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataEVM[j, 0, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Frequency error TM2.0")
+                                {
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    bool isSuccess = double.TryParse(dataFreqErr[j, 0, 0], out RS);
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Abs(Math.Round(RS, 1));
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataFreqErr[j, 0, 0] = PassFail;  // 4 Result
+                                    dataFreqErr[j, 0, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataFreqErr[j, 0, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Modulation quality TM2.0a")
+                                {
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    mode = "NRTM_20a";
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    Measurement.EVMFreqErr5G(VSA, BBU, mode, arrAttDL[j], (j+1), setFrequency, setPower, setBandwidth, out evm, out Result[0]);
+                                    OFDM[j, 0] = evm[10]; // giá trị OFDM power 2.0a
+                                    dataFreqErr[j, 1, 0] = Result[0];
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    bool isSuccess = double.TryParse(evm[3], out RS); //evm[3] giá trị EVM 256QAM
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Round(RS, 1);
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataEVM[j, 1, 0] = PassFail;  // 4 Result
+                                    dataEVM[j, 1, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataEVM[j, 1, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Frequency error TM2.0a")
+                                {
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    bool isSuccess = double.TryParse(dataFreqErr[j, 1, 0], out RS);
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Abs(Math.Round(RS, 1));
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataFreqErr[j, 1, 0] = PassFail;  // 4 Result
+                                    dataFreqErr[j, 1, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataFreqErr[j, 1, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Modulation quality TM3.1")
+                                {
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    mode = "NRTM_31";
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    Measurement.EVMFreqErr5G(VSA, BBU, mode, arrAttDL[j], (j + 1), setFrequency, setPower, setBandwidth, out evm, out Result[0]);
+                                    dataFreqErr[j, 2, 0] = Result[0];
+                                    bool isSuccess = double.TryParse(evm[2], out RS); //evm[3] giá trị EVM 64QAM
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Round(RS, 1);
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataEVM[j, 2, 0] = PassFail;  // 4 Result
+                                    dataEVM[j, 2, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataEVM[j, 2, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Frequency error TM3.1")
+                                {
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    bool isSuccess = double.TryParse(dataFreqErr[j, 3, 0], out RS);
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Abs(Math.Round(RS, 1));
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataFreqErr[j, 2, 0] = PassFail;  // 4 Result
+                                    dataFreqErr[j, 2, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataFreqErr[j, 2, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Modulation quality TM3.1a")
+                                {
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    mode = "NRTM_31a";
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    Measurement.EVMFreqErr5G(VSA, BBU, mode, arrAttDL[j], (j + 1),setFrequency, setPower, setBandwidth, out evm, out Result[0]);
+                                    OFDM[j, 1] = evm[10]; // giá trị OFDM power 2.0a
+                                    dataFreqErr[j, 3, 0] = Result[0];
+                                    bool isSuccess = double.TryParse(evm[3], out RS); //evm[3] giá trị EVM 256QAM
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Round(RS, 1);
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataEVM[j, 3, 0] = PassFail;  // 4 Result
+                                    dataEVM[j, 3, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataEVM[j, 3, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Frequency error TM3.1a")
+                                {
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    bool isSuccess = double.TryParse(dataFreqErr[j, 3, 0], out RS);
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Abs(Math.Round(RS, 1));
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataFreqErr[j, 3, 0] = PassFail;  // 4 Result
+                                    dataFreqErr[j, 3, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataFreqErr[j, 3, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Modulation quality TM3.2")
+                                {
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    mode = "NRTM_32";
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    Measurement.EVMFreqErr5G(VSA, BBU, mode, arrAttDL[j], (j + 1), setFrequency, setPower, setBandwidth, out evm, out Result[0]);
+                                    dataFreqErr[j, 4, 0] = Result[0];
+                                    bool isSuccess = double.TryParse(evm[1], out RS); //giá trị EVM 16QAM
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Round(RS, 1);
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataEVM[j, 4, 0] = PassFail;  // 4 Result
+                                    dataEVM[j, 4, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataEVM[j, 4, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Frequency error TM3.2")
+                                {
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    bool isSuccess = double.TryParse(dataFreqErr[j, 4, 0], out RS);
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Abs(Math.Round(RS, 1));
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataFreqErr[j, 4, 0] = PassFail;  // 4 Result
+                                    dataFreqErr[j, 4, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataFreqErr[j, 4, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Modulation quality TM3.3")
+                                {
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    mode = "NRTM_33";
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    Measurement.EVMFreqErr5G(VSA, BBU, mode, arrAttDL[j], (j + 1), setFrequency, setPower, setBandwidth, out evm, out Result[0]);
+                                    dataFreqErr[j, 5, 0] = Result[0];
+                                    bool isSuccess = double.TryParse(evm[0], out RS); //giá trị EVM QPSK
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Round(RS, 1);
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataEVM[j, 5, 0] = PassFail;  // 4 Result
+                                    dataEVM[j, 5, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataEVM[j, 5, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Frequency error TM3.3")
+                                {
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    bool isSuccess = double.TryParse(dataFreqErr[j, 5, 0], out RS);
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Abs(Math.Round(RS, 1));
+                                        if (RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataFreqErr[j, 5, 0] = PassFail;  // 4 Result
+                                    dataFreqErr[j, 5, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataFreqErr[j, 5, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Total power dynamic range")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    limitMin = double.Parse(measClause[i, 2]);
+                                    RS = Math.Abs(double.Parse(OFDM[j, 1]) - double.Parse(OFDM[j, 0]));
+                                    RS = Math.Round(RS, 1);
+                                    if (RS >= limitMin)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    result = RS.ToString();
+                                    dataTotalDR[j, 0] = PassFail;  // 4 Result
+                                    dataTotalDR[j, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataTotalDR[j, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Transmitter spurious emissions")
+                                {
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port" + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    MessageBox.Show("Đổi sang Port" + (j + 1));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    mode = "NRTM_11";
+                                    limitMin = double.Parse(measClause[i, 2]);
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    Measurement.Spur5G(VSA, BBU, mode, arrAttDL[j], setFrequency, setBandwidth, out dbRS);
+                                    RS = -100;
+                                    dataTXSUPR[j, 2] = Math.Round(dbRS[0], 1).ToString();  // Read Value 1
+                                    dataTXSUPR[j, 3] = Math.Round(dbRS[1], 1).ToString();  // Read Value 2
+                                    dataTXSUPR[j, 4] = Math.Round(dbRS[2], 1).ToString();  // Read Value 3
+                                    dataTXSUPR[j, 5] = Math.Round(dbRS[3], 1).ToString();  // Read Value 4
+                                    dataTXSUPR[j, 6] = Math.Round(dbRS[4], 1).ToString();  // Read Value 5
+                                    for (int y = 0; y < 3; y++)
+                                    {
+                                        if (dbRS[y] > RS)
+                                        {
+                                            RS = dbRS[y];
+                                        }
+                                    }
+                                    dbRS[0] = RS;
+                                    for (int y = 3; y < 5; y++)
+                                    {
+                                        if (dbRS[y] > RS)
+                                        {
+                                            RS = dbRS[y];
+                                        }
+                                    }
+                                    dbRS[1] = RS;
+                                    if ((dbRS[0] > limitMin) && (dbRS[1] > limitMax))
+                                    {
+                                        PassFail = fail;
+                                        RS = Math.Max(dbRS[0], dbRS[1]);
+                                        reTest = true;
+                                    }
+                                    else if (dbRS[0] > limitMin)
+                                    {
+                                        PassFail = fail;
+                                        RS = dbRS[0];
+                                        reTest = true;
+                                    }
+                                    else if (dbRS[1] > limitMax)
+                                    {
+                                        PassFail = fail;
+                                        RS = dbRS[1];
+                                        reTest = true;
+                                    }
+                                    else
+                                    {
+                                        PassFail = pass;
+                                        RS = Math.Max(dbRS[0], dbRS[1]);
+                                    }
+                                    result = Math.Round(RS, 1).ToString();
+                                    dataTXSUPR[j, 0] = PassFail;  // Result
+                                    dataTXSUPR[j, 1] = DateTime.Now.ToString("hh:mm:ss");  // Testing Time
+                                    Console.WriteLine("Ket qua cuoi cung  " + RS);
+                                }
+                                else if (measClause[i, 0] == "+ Transmitter OFF Power")
+                                {
+                                    MessageBox.Show("Đổi sang port " + (j + 1), "Thông báo");
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText("Test time: " + (timeout + 1));
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    mode = "TM1.1";
+                                    Measurement.OnOffPower5G(VSA, BBU, mode, j + 1, attOnOff, setFrequency, out Result[0], out Result[1]);
+                                    LogText("On/Off Power port " + (j + 1) + ":" + Result[0] + " dBm/MHz");
+                                    LogText("On/Off Transient port " + (j + 1) + ":" + Result[1] + " us");
+                                    Transient[j, 1] = Result[1];
+                                    bool isSuccess = double.TryParse(Result[0], out RS);
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Round(RS, 1);
+                                        if (RS < limitMin)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+
+                                            PassFail = pass;
+
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataOnOffPower[j, 0] = PassFail;  // 4 Result
+                                    dataOnOffPower[j, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataOnOffPower[j, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Transmitter transient period")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    RS = double.Parse(Transient[j, 1]);
+                                    if (RS <= limitMax)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    result = RS.ToString();
+                                    dataTransient[j, 0] = PassFail;  // 4 Result
+                                    dataTransient[j, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataTransient[j, 2] = result;     // 1 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Time alignment error")
+                                {
+                                    
+                                    //MessageBox.Show("Đổi sang port " + (j + 1), "Thông báo");
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText("Test time: " + (timeout + 1));
+                                    limitMin = double.Parse(measClause[i, 2]);
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    mode = "NRTM_11";                                    
+                                    string taeref = taetmp ;
+                                    Measurement.TAEMeasurement(VSA, BBU, mode, (j + 1), arrAttDL[j], setFrequency, ref taeref, ref Result);
+                                    taetmp = taeref;
+                                    bool isSuccess = double.TryParse(Result[0], out RS);
+                                    if (isSuccess)
+                                    {
+                                        RS = Math.Round(RS, 1);
+                                        if (limitMin > RS || RS > limitMax)
+                                        {
+                                            PassFail = fail;
+                                            reTest = true;
+                                        }
+                                        else
+                                        {
+                                            PassFail = pass;
+                                        }
+                                        result = RS.ToString();
+                                    }
+                                    else
+                                    {
+                                        result = error;
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    dataTAE[j, 0] = PassFail;  // 4 Result
+                                    dataTAE[j, 1] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataTAE[j, 2] = result;     // 1 Reading Value
+                                }
+                                #region IMD
+                                else if (measClause[i, 0] == "+ Transmitter intermodulation (ACLR)")
+                                {
+                                    if (j != 0) { MessageBox.Show("Đổi sang Port" + (j + 1), "Thông báo"); }
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    mode = "NRTM_11";
+                                    BBU.CHG_RRU_POWER(int.Parse(setPower));
+                                    Measurement.IMDACLR5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setBandwidth, "-25", measClause[i, 6], out RS);
+                                    imdACLR[0] = RS;
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDACLR5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setBandwidth, "25", measClause[i, 6], out RS);
+                                    imdACLR[1] = RS;
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDACLR5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setBandwidth, "-15", measClause[i, 6], out RS);
+                                    imdACLR[2] = RS;
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDACLR5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setBandwidth, "15", measClause[i, 6], out RS);
+                                    imdACLR[3] = RS;
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDACLR5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setBandwidth, "-5", measClause[i, 6], out RS);
+                                    imdACLR[4] = RS;
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDACLR5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setBandwidth, "5", measClause[i, 6], out RS);
+                                    imdACLR[5] = RS;
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    BBU.CHG_RRU_POWER(1000);
+
+                                    RS = 100;
+                                    for (int x = 0; x < 6; x++)
+                                    {
+                                        if (imdACLR[x] < RS)
+                                        {
+                                            RS = imdACLR[x];
+                                        }
+                                    }
+                                    Console.WriteLine("Ket qua cuôi cùng  " + RS);
+                                    if (RS < limitMin)
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    else
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    result = Math.Round(RS, 1).ToString();
+
+                                }
+                                else if (measClause[i, 0] == "+ Transmitter intermodulation (SEM)")
+                                {
+                                    if (j != 0) { MessageBox.Show("Đổi sang Port" + (j + 1), "Thông báo"); }
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    mode = "NRTM_11";
+                                    BBU.CHG_RRU_POWER(int.Parse(setPower));
+                                    Measurement.IMDSEM5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setPower, setBandwidth, "-25", measClause[i, 6], out Result[0]);
+                                    imdSEM[0] = double.Parse(Result[0]);
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDSEM5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setPower, setBandwidth, "25", measClause[i, 6], out Result[0]);
+                                    imdSEM[1] = double.Parse(Result[0]);
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDSEM5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setPower, setBandwidth, "-15", measClause[i, 6], out Result[0]);
+                                    imdSEM[2] = double.Parse(Result[0]);
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDSEM5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setPower, setBandwidth, "15", measClause[i, 6], out Result[0]);
+                                    imdSEM[3] = double.Parse(Result[0]);
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDSEM5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setPower, setBandwidth, "-5", measClause[i, 6], out Result[0]);
+                                    imdSEM[4] = double.Parse(Result[0]);
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDSEM5G(VSA, VSG1, BBU, mode, attIMD, setFrequency, setPower, setBandwidth, "5", measClause[i, 6], out Result[0]);
+                                    imdSEM[5] = double.Parse(Result[0]);
+                                    BBU.CHG_RRU_POWER(1000);
+                                    RS = -100;
+                                    for (int x = 0; x < 6; x++)
+                                    {
+                                        if (imdSEM[x] > RS)
+                                        {
+                                            RS = imdSEM[x];
+                                        }
+                                    }
+                                    Console.WriteLine("Ket qua cuôi cùng  " + RS);
+
+                                    if (RS <= limitMax)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    result = Math.Round(RS, 1).ToString();
+                                }
+                                else if (measClause[i, 0] == "+ Transmitter intermodulation (SPUR)")
+                                {
+                                    if (j != 0) { MessageBox.Show("Đổi sang Port" + (j + 1), "Thông báo"); }
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    if (j < 16) { rfSwitch1.SetSwitch(rfs1Ax, "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch(rfs1Ax, "N2", out respond); }
+                                    limitMin = double.Parse(measClause[i, 2]);
+                                    limitMax = double.Parse(measClause[i, 3]);
+                                    mode = "NRTM_11";
+                                    BBU.CHG_RRU_POWER(int.Parse(setPower));
+                                    Measurement.IMDTSE5G(VSA, VSG1, BBU, mode, attIMD1, setFrequency, setPower, setBandwidth, "-25", measClause[i, 6], out dbRS);
+                                    imdTSE[0, 0] = dbRS[0];
+                                    imdTSE[0, 1] = dbRS[1];
+                                    imdTSE[0, 2] = dbRS[2];
+                                    //imdTSE[0, 3] = dbRS[3];
+                                    //imdTSE[0, 4] = dbRS[4];
+                                    //imdTSE[0, 5] = dbRS[5];
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDTSE5G(VSA, VSG1, BBU, mode, attIMD1, setFrequency, setPower, setBandwidth, "25", measClause[i, 6], out dbRS);
+                                    imdTSE[1, 0] = dbRS[0];
+                                    imdTSE[1, 1] = dbRS[1];
+                                    imdTSE[1, 2] = dbRS[2];
+                                    //imdTSE[1, 3] = dbRS[3];
+                                    //imdTSE[1, 4] = dbRS[4];
+                                    //imdTSE[1, 5] = dbRS[5];
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDTSE5G(VSA, VSG1, BBU, mode, attIMD1, setFrequency, setPower, setBandwidth, "-15", measClause[i, 6], out dbRS);
+                                    imdTSE[2, 0] = dbRS[0];
+                                    imdTSE[2, 1] = dbRS[1];
+                                    imdTSE[2, 2] = dbRS[2];
+                                    //imdTSE[2, 3] = dbRS[3];
+                                    //imdTSE[2, 4] = dbRS[4];
+                                    //imdTSE[2, 5] = dbRS[5];
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDTSE5G(VSA, VSG1, BBU, mode, attIMD1, setFrequency, setPower, setBandwidth, "15", measClause[i, 6], out dbRS);
+                                    imdTSE[3, 0] = dbRS[0];
+                                    imdTSE[3, 1] = dbRS[1];
+                                    imdTSE[3, 2] = dbRS[2];
+                                    //imdTSE[3, 3] = dbRS[3];
+                                    //imdTSE[3, 4] = dbRS[4];
+                                    //imdTSE[3, 5] = dbRS[5];
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDTSE5G(VSA, VSG1, BBU, mode, attIMD1, setFrequency, setPower, setBandwidth, "-5", measClause[i, 6], out dbRS);
+                                    imdTSE[4, 0] = dbRS[0];
+                                    imdTSE[4, 1] = dbRS[1];
+                                    imdTSE[4, 2] = dbRS[2];
+                                    //imdTSE[4, 3] = dbRS[3];
+                                    //imdTSE[4, 4] = dbRS[4];
+                                    //imdTSE[4, 5] = dbRS[5];
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.IMDTSE5G(VSA, VSG1, BBU, mode, attIMD1, setFrequency, setPower, setBandwidth, "5", measClause[i, 6], out dbRS);
+                                    imdTSE[5, 0] = dbRS[0];
+                                    imdTSE[5, 1] = dbRS[1];
+                                    imdTSE[5, 2] = dbRS[2];
+                                    //imdTSE[5, 3] = dbRS[3];
+                                    //imdTSE[5, 4] = dbRS[4];
+                                    //imdTSE[5, 5] = dbRS[5];
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    BBU.CHG_RRU_POWER(1000);
+                                    RS = -100;
+                                    for (int x = 0; x < 6; x++)
+                                    {
+                                        for (int y = 0; y < 2; y++)
+                                        {
+                                            if (imdTSE[x, y] > RS)
+                                            {
+                                                RS = imdTSE[x, y];
+                                            }
+                                        }
+                                    }
+                                    dbRS[0] = RS;
+                                    //for (int x = 0; x < 3; x++)
+                                    //{
+                                    //    for (int y = 4; y < 6; y++)
+                                    //    {
+                                    //        if (imdTSE[x, y] > RS)
+                                    //        {
+                                    //            RS = imdTSE[x, y];
+                                    //        }
+                                    //    }
+                                    //}
+                                    dbRS[1] = RS;
+                                    if ((dbRS[0] > limitMin) && (dbRS[1] > limitMax))
+                                    {
+                                        PassFail = fail;
+                                        RS = Math.Max(dbRS[0], dbRS[1]);
+                                        reTest = true;
+                                    }
+                                    else if (dbRS[0] > limitMin)
+                                    {
+                                        PassFail = fail;
+                                        RS = dbRS[0];
+                                        reTest = true;
+                                    }
+                                    else if (dbRS[1] > limitMax)
+                                    {
+                                        PassFail = fail;
+                                        RS = dbRS[1];
+                                        reTest = true;
+                                    }
+                                    else
+                                    {
+                                        PassFail = pass;
+                                        RS = Math.Max(dbRS[0], dbRS[1]);
+                                    }
+                                    result = Math.Round(RS, 1).ToString();
+                                    Console.WriteLine("Ket qua cuôi cùng  " + result);
+                                }
+                                #endregion
+                                #endregion
+                                #region uplink
+                                else if (measClause[i, 0] == "RX Power Calibration" && j == 0)
+                                {
+                                    bool flagrx = true;
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    lblStatusProgress_TextChanged(measClause[i, 0]);
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    BBU.StopProcess();
+                                    mode = "";
+                                    Measurement.calibRX(BBU, rfSwitch1, rfSwitch2, rfSwitch3, VSG1, setFrequency, "-30", out RS, out flagrx);
+                                    if (flagrx == true)
+                                    {
+                                        if (RS <= limitMax)
+                                        {
+                                            result = RS.ToString();
+                                            PassFail = "PASS";
+
+                                        }
+                                        else
+                                        {
+                                            PassFail = "FAIL";
+                                            result = RS.ToString();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        PassFail = "FAIL";
+                                        result = RS.ToString();
+                                    }
+                                    dataCalibRx[0] = measClause[i, 2]; // 0 Min limit
+                                    dataCalibRx[1] = result;     // 1 Reading Value
+                                    dataCalibRx[2] = measClause[i, 3]; // 2 Max limit
+                                    dataCalibRx[3] = DateTime.Now.ToString("hh:mm:ss");  // 3 Testing Time
+                                    dataCalibRx[4] = PassFail;  // 4 Result
+                                    ListViewShow("PORT" + (j + 1), measClause[i, 0].Remove(0, 2), measClause[i, 1], measClause[i, 2], result, measClause[i, 3], mode, PassFail, note);
+                                }
+                                /// cac bai do phia uplink chuong 7 3GPP
+                                // TODO: Reference Sensitivity Level
+                                else if (measClause[i, 0] == "+ Reference Sensitivity Level")
+                                {
+                                    if (j < 16) { rfSwitch1.SetSwitch("A2", "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch("A2", "N2", out respond); }
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    //if (j == 0) { VSG2.OffSignal(); BBU.Switch("1"); }
+                                    //else if (j == 8) { BBU.Switch("3"); }
+                                    //else if (j == 16) { BBU.Switch("4"); }
+                                    //else if (j == 24) { BBU.Switch("2"); }
+                                    //TODO: Switch chip based on port number
+                                    BBU.Switch(j);
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    string Power = (double.Parse(measClause[i, 8]) + double.Parse(arrAttUL[j])).ToString();
+                                    Measurement.oneVSGMode(VSG1, BBU, "SEN", int.Parse(measClause[i, 6]), measClause[i, 3], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), Power, setFrequency, out tp);
+                                    if (tp >= 95)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    result = measClause[i, 8];
+                                    mode = tp.ToString();
+                                    dataPsen[j, 0] = PassFail;  // 0 Result
+                                    dataPsen[j, 1] = DateTime.Now.ToString("hh:mm:ss");  // 2 Testing Time
+                                    dataPsen[j, 2] = tp.ToString();     // 3 Reading Value
+                                    dataPsen[j, 3] = result;     // 4 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Dynamic Range")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    if (j < 16) { rfSwitch1.SetSwitch("A2", "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch("A2", "N2", out respond); }
+                                    BBU.Switch(j);
+
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    string wsPower = (double.Parse(measClause[i, 8]) + double.Parse(arrAttUL[j])).ToString();
+                                    Measurement.oneVSGMode(VSG1, BBU, "DR", int.Parse(measClause[i, 6]), measClause[i, 2], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, out tp);
+                                    if (tp >= 95)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    mode = tp.ToString();
+                                    result = measClause[i, 9];
+                                    dataDR[j, 0] = PassFail;  // 0 Result
+                                    dataDR[j, 1] = DateTime.Now.ToString("hh:mm:ss");  // 2 Testing Time
+                                    dataDR[j, 2] = tp.ToString();     // 3 Reading Value
+                                    dataDR[j, 3] = result;     // 4 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ In-Channel Selectivity (ICS)")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    if (j < 16) { rfSwitch1.SetSwitch("A2", "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch("A2", "N2", out respond); }
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    BBU.Switch(j);
+
+                                    string wsPower = (double.Parse(measClause[i, 8]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPower = (double.Parse(measClause[i, 9]) + double.Parse(arrAttUL[j])).ToString();
+                                    string offset = measClause[i, 11];
+                                    string isFreq = (double.Parse(setFrequency) + double.Parse(offset) * 1000000).ToString();
+                                    Measurement.twoVSGMode(VSG1, VSG2, BBU, "ICS", measClause[i, 6], "51", double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPower, isFreq, out tp);
+                                    if (tp >= 95)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    result = measClause[i, 9];
+                                    mode = tp.ToString();
+                                    dataICS[j, 0] = PassFail;  // 0 Result
+                                    dataICS[j, 1] = DateTime.Now.ToString("hh:mm:ss");  // 2 Testing Time
+                                    dataICS[j, 2] = tp.ToString();     // 3 Reading Value
+                                    dataICS[j, 3] = result;     // 4 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Adjacent Channel Selectivity (ACS)")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    if (j < 16) { rfSwitch1.SetSwitch("A2", "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch("A2", "N2", out respond); }
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    BBU.Switch(j);
+
+                                    string wsPower = (double.Parse(measClause[i, 8]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerLower = (double.Parse(measClause[i, 9]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerUpper = (double.Parse(measClause[i, 10]) + double.Parse(arrAttUL[j])).ToString();
+                                    string offset = measClause[i, 11];
+                                    string isFreqUpper = Convert.ToString(double.Parse(setFrequency) + (double.Parse(setBandwidth) * 1000000) / 2 + (double.Parse(offset) * 1000000));
+                                    string isFreqLower = Convert.ToString(double.Parse(setFrequency) - (double.Parse(setBandwidth) * 1000000) / 2 - (double.Parse(offset) * 1000000));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+
+                                    Measurement.twoVSGMode(VSG1, VSG2, BBU, "ACS", measClause[i, 6], measClause[i, 2], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerUpper, isFreqUpper, out tp);
+                                    dataACS[j, 0, 2] = tp.ToString();
+
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.twoVSGMode(VSG1, VSG2, BBU, "ACS", measClause[i, 6], measClause[i, 2], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerLower, isFreqLower, out tp);
+                                    dataACS[j, 1, 2] = tp.ToString();
+
+                                    if (double.Parse(dataACS[j, 0, 2]) > double.Parse(dataACS[j, 1, 2]))
+                                    {
+                                        tp = double.Parse(dataACS[j, 1, 2]);
+                                    }
+                                    else
+                                    {
+                                        tp = double.Parse(dataACS[j, 0, 2]);
+                                    }
+                                    if (tp >= 95)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    result = measClause[i, 9];
+                                    mode = tp.ToString();
+                                    dataACS[j, 0, 0] = PassFail;  // 0 Result
+                                    dataACS[j, 0, 1] = DateTime.Now.ToString("hh:mm:ss");  // 2 Testing Time
+                                    dataACS[j, 0, 2] = tp.ToString();     // 3 Reading Value
+                                    dataACS[j, 0, 3] = result;     // 4 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Inband Blocking")
+                                {
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    if (j < 16) { rfSwitch1.SetSwitch("A2", "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch("A2", "N2", out respond); }
+                                    BBU.Switch(j);
+
+                                    string wsPower = (double.Parse(measClause[i, 8]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerLower = (double.Parse(measClause[i, 9]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerUpper = (double.Parse(measClause[i, 10]) + double.Parse(arrAttUL[j])).ToString();
+                                    string offset = measClause[i, 11];
+                                    string isFreqUpper = Convert.ToString(double.Parse(setFrequency) + (double.Parse(setBandwidth) * 1000000) / 2 + (double.Parse(offset) * 1000000));
+                                    string isFreqLower = Convert.ToString(double.Parse(setFrequency) - (double.Parse(setBandwidth) * 1000000) / 2 - (double.Parse(offset) * 1000000));
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+
+                                    Measurement.twoVSGMode(VSG1, VSG2, BBU, "INB", measClause[i, 6], measClause[i, 2], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerUpper, isFreqUpper, out tp);
+                                    dataINB[j, 0, 2] = tp.ToString();
+
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.twoVSGMode(VSG1, VSG2, BBU, "INB", measClause[i, 6], measClause[i, 2], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerLower, isFreqLower, out tp);
+                                    dataINB[j, 1, 2] = tp.ToString();
+
+                                    if (double.Parse(dataINB[j, 0, 2]) > double.Parse(dataINB[j, 1, 2]))
+                                    {
+                                        tp = double.Parse(dataINB[j, 1, 2]);
+                                    }
+                                    else
+                                    {
+                                        tp = double.Parse(dataINB[j, 0, 2]);
+                                    }
+                                    if (tp >= 95)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    result = measClause[i, 9];
+                                    mode = tp.ToString();
+                                    dataINB[j, 0, 0] = PassFail;  // 0 Result
+                                    dataINB[j, 0, 1] = DateTime.Now.ToString("hh:mm:ss");  // 2 Testing Time
+                                    dataINB[j, 0, 2] = tp.ToString();     // 3 Reading Value
+                                    dataINB[j, 0, 3] = result;     // 4 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Narrow band blocking")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (j < 16) { rfSwitch1.SetSwitch("A2", "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch("A2", "N2", out respond); }
+                                    BBU.Switch(j);
+
+                                    string wsPower = (double.Parse(measClause[i, 8]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerLower = (double.Parse(measClause[i, 9]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerUpper = (double.Parse(measClause[i, 10]) + double.Parse(arrAttUL[j])).ToString();
+                                    string offset = measClause[i, 11];
+                                    string isFreqUpper = Convert.ToString(double.Parse(setFrequency) + (double.Parse(setBandwidth) * 1000000) / 2 + (double.Parse(offset) * 1000000));
+                                    string isFreqLower = Convert.ToString(double.Parse(setFrequency) - (double.Parse(setBandwidth) * 1000000) / 2 - (double.Parse(offset) * 1000000));
+
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    Measurement.twoVSGMode(VSG1, VSG2, BBU, "NBB", measClause[i, 6], "0", double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerUpper, isFreqUpper, out tp);
+                                    dataNBB[j, 0, 2] = tp.ToString();
+
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.twoVSGMode(VSG1, VSG2, BBU, "NBB", measClause[i, 6], "99", double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerLower, isFreqLower, out tp);
+                                    dataNBB[j, 1, 2] = tp.ToString();
+
+                                    if (double.Parse(dataNBB[j, 0, 2]) > double.Parse(dataNBB[j, 1, 2]))
+                                    {
+                                        tp = double.Parse(dataNBB[j, 1, 2]);
+                                    }
+                                    else
+                                    {
+                                        tp = double.Parse(dataNBB[j, 0, 2]);
+                                    }
+                                    if (tp >= 95)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    result = measClause[i, 9];
+                                    mode = tp.ToString();
+                                    dataNBB[j, 0, 0] = PassFail;  // 0 Result
+                                    dataNBB[j, 0, 1] = DateTime.Now.ToString("hh:mm:ss");  // 2 Testing Time
+                                    dataNBB[j, 0, 2] = tp.ToString();     // 3 Reading Value
+                                    dataNBB[j, 0, 3] = result;     // 4 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Out-of-band Blocking")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (j < 16) { rfSwitch1.SetSwitch("A2", "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch("A2", "N2", out respond); }
+                                    BBU.Switch(j);
+
+                                    string wsPower = (double.Parse(measClause[i, 8]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerLower = (double.Parse(measClause[i, 9]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerUpper = (double.Parse(measClause[i, 10]) + double.Parse(arrAttUL[j])).ToString();
+                                    string offset = measClause[i, 11];
+                                    string isFreqUpper = Convert.ToString(2690000000 + (double.Parse(offset) * 1000000)); // band n41 2496 – 2690
+                                    string isFreqLower = Convert.ToString(2496000000 - (double.Parse(offset) * 1000000));
+
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+
+                                    Measurement.twoVSGMode(VSG1, VSG2, BBU, "OOBB", measClause[i, 6], measClause[i, 2], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerUpper, isFreqUpper, out tp);
+                                    dataOBB[j, 0, 2] = tp.ToString();
+
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.twoVSGMode(VSG1, VSG2, BBU, "OOBB", measClause[i, 6], measClause[i, 2], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerLower, isFreqLower, out tp);
+                                    dataOBB[j, 1, 2] = tp.ToString();
+
+                                    if (double.Parse(dataOBB[j, 0, 2]) > double.Parse(dataOBB[j, 1, 2]))
+                                    {
+                                        tp = double.Parse(dataOBB[j, 1, 2]);
+                                    }
+                                    else
+                                    {
+                                        tp = double.Parse(dataOBB[j, 0, 2]);
+                                    }
+                                    if (tp >= 95)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    result = measClause[i, 9];
+                                    mode = tp.ToString();
+                                    dataOBB[j, 0, 0] = PassFail;  // 0 Result
+                                    dataOBB[j, 0, 1] = DateTime.Now.ToString("hh:mm:ss");  // 2 Testing Time
+                                    dataOBB[j, 0, 2] = tp.ToString();     // 3 Reading Value
+                                    dataOBB[j, 0, 3] = result;     // 4 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ General intermodulation")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (j < 16) { rfSwitch1.SetSwitch("A2", "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch("A2", "N2", out respond); }
+                                    BBU.Switch(j);
+
+                                    string wsPower = (double.Parse(measClause[i, 8]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerLower = (double.Parse(measClause[i, 9]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerUpper = (double.Parse(measClause[i, 10]) + double.Parse(arrAttUL[j])).ToString();
+                                    string offset = measClause[i, 11];
+                                    string isFreqLower = Convert.ToString(double.Parse(setFrequency) - (double.Parse(setBandwidth) * 1000000) / 2 - (double.Parse(offset) * 1000000));
+                                    string isFreqUpper = Convert.ToString(double.Parse(setFrequency) + (double.Parse(setBandwidth) * 1000000) / 2 + (double.Parse(offset) * 1000000));
+                                    string cwOffset = measClause[i, 13];
+                                    string cwFreqLower = Convert.ToString(double.Parse(setFrequency) - (double.Parse(setBandwidth) * 1000000) / 2 - (double.Parse("7.48") * 1000000));
+                                    string cwFreqUpper = Convert.ToString(double.Parse(setFrequency) + (double.Parse(setBandwidth) * 1000000) / 2 + (double.Parse("7.48") * 1000000));
+
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+
+                                    Measurement.threeVSGMode(VSG1, VSG2, VSG3, BBU, "GenIMD", int.Parse(measClause[i, 6]), measClause[i, 2], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerUpper, isFreqUpper, cwFreqUpper, out tp);
+                                    dataRXIMD[0, j, 0, 2] = tp.ToString();
+
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    Measurement.threeVSGMode(VSG1, VSG2, VSG3, BBU, "GenIMD", int.Parse(measClause[i, 6]), measClause[i, 2], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerLower, isFreqLower, cwFreqLower, out tp);
+                                    dataRXIMD[0, j, 1, 2] = tp.ToString();
+
+                                    if (double.Parse(dataRXIMD[0, j, 0, 2]) > double.Parse(dataRXIMD[0, j, 1, 2]))
+                                    {
+                                        tp = double.Parse(dataRXIMD[0, j, 1, 2]);
+                                    }
+                                    else
+                                    {
+                                        tp = double.Parse(dataRXIMD[0, j, 0, 2]);
+                                    }
+                                    if (tp >= 95)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    result = measClause[i, 9];
+                                    mode = tp.ToString();
+                                    dataRXIMD[0, j, 0, 0] = PassFail;  // 0 Result
+                                    dataRXIMD[0, j, 0, 1] = DateTime.Now.ToString("hh:mm:ss");  // 2 Testing Time
+                                    dataRXIMD[0, j, 0, 2] = tp.ToString();     // 3 Reading Value
+                                    dataRXIMD[0, j, 0, 3] = result;     // 4 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Narrow-band intermodulation")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    if (j < 16) { rfSwitch1.SetSwitch("A2", "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch("A2", "N2", out respond); }
+
+                                    BBU.Switch(j);
+
+                                    string wsPower = (double.Parse(measClause[i, 8]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerLower = (double.Parse(measClause[i, 9]) + double.Parse(arrAttUL[j])).ToString();
+                                    string isPowerUpper = (double.Parse(measClause[i, 10]) + double.Parse(arrAttUL[j])).ToString();
+                                    string offset = measClause[i, 11];
+                                    string isFreqLower = Convert.ToString(double.Parse(setFrequency) - (double.Parse(setBandwidth) * 1000000) / 2 - (double.Parse(offset) * 1000000));
+                                    string isFreqUpper = Convert.ToString(double.Parse(setFrequency) + (double.Parse(setBandwidth) * 1000000) / 2 + (double.Parse(offset) * 1000000));
+                                    string cwOffset = measClause[i, 13];
+                                    string cwFreqLower = Convert.ToString(double.Parse(setFrequency) - (double.Parse(setBandwidth) * 1000000) / 2 - (double.Parse("0.385") * 1000000));
+                                    string cwFreqUpper = Convert.ToString(double.Parse(setFrequency) + (double.Parse(setBandwidth) * 1000000) / 2 + (double.Parse("0.385") * 1000000));
+
+                                    Measurement.threeVSGMode(VSG1, VSG2, VSG3, BBU, "NBIMD", int.Parse(measClause[i, 6]), measClause[i, 2], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerUpper, isFreqUpper, cwFreqUpper, out tp);
+                                    dataRXIMD[1, j, 0, 2] = tp.ToString();
+
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    Measurement.threeVSGMode(VSG1, VSG2, VSG3, BBU, "NBIMD", int.Parse(measClause[i, 6]), measClause[i, 2], double.Parse(measClause[i, 7]), arrAttUL[j], (j + 1), wsPower, setFrequency, isPowerLower, isFreqLower, cwFreqLower, out tp);
+                                    dataRXIMD[1, j, 1, 2] = tp.ToString();
+
+                                    if (double.Parse(dataRXIMD[1, j, 0, 2]) > double.Parse(dataRXIMD[1, j, 1, 2]))
+                                    {
+                                        tp = double.Parse(dataRXIMD[1, j, 1, 2]);
+                                    }
+                                    else
+                                    {
+                                        tp = double.Parse(dataRXIMD[1, j, 0, 2]);
+                                    }
+                                    if (tp >= 95)
+                                    {
+                                        PassFail = pass;
+                                    }
+                                    else
+                                    {
+                                        PassFail = fail;
+                                        reTest = true;
+                                    }
+                                    result = measClause[i, 9];
+                                    mode = tp.ToString();
+                                    dataRXIMD[1, j, 0, 0] = PassFail;  // 0 Result
+                                    dataRXIMD[1, j, 0, 1] = DateTime.Now.ToString("hh:mm:ss");  // 2 Testing Time
+                                    dataRXIMD[1, j, 0, 2] = tp.ToString();     // 3 Reading Value
+                                    dataRXIMD[1, j, 0, 3] = result;     // 4 Reading Value
+                                }
+                                else if (measClause[i, 0] == "+ Receiver Spurious Emissions")
+                                {
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                }
+                                #endregion
+                                if (measClause[i, 0] != "+ RX Power Calibration")
+                                    ListViewShow("PORT" + (j + 1), measClause[i, 0].Remove(0, 2), measClause[i, 1], measClause[i, 2], result, measClause[i, 3], mode, PassFail, note) ;
+
+                                #region Characteristic receiver
+                                // TODO: Characterise sensitivity
+                                if (measClause[i, 0] == "+ Characterise sensitivity")
+                                {
+                                    if (j < 16) { rfSwitch1.SetSwitch("A2", "N1", out respond); }
+                                    else { rfSwitch1.SetSwitch("A2", "N2", out respond); }
+                                    if (measurementBackgroundWorker.CancellationPending) return;
+                                    System.Threading.Thread.Sleep(1);
+                                    BBU.Switch(j);
+                                    lblStatusProgress_TextChanged(measClause[i, 0] + " :Port " + (j + 1));
+                                    LogText(measClause[i, 0] + " :Port " + (j + 1));
+                                    double.TryParse(measClause[i, 3], out limitMax);
+                                    double.TryParse(measClause[i, 2], out limitMin);
+                                    string Power = (double.Parse(measClause[i, 8]) + double.Parse(arrAttUL[j])).ToString();
+                                    string modeMeas = "SEN";
+                                    double stepdB = double.Parse(measClause[i, 7]);
+
+                                    Measurement.oneVSGModeCharacterise(VSG1, BBU, modeMeas, stepdB, arrAttUL[j], (j + 1), Power, setFrequency, out tp);
+                                    result = measClause[i, 8];
+                                    mode = tp.ToString();
+                                    dataPsen[j, 0] = PassFail;  // 0 Result
+                                    dataPsen[j, 1] = DateTime.Now.ToString("hh:mm:ss");  // 2 Testing Time
+                                    dataPsen[j, 2] = tp.ToString();     // 3 Reading Value
+                                    dataPsen[j, 3] = result;     // 4 Reading Value
+                                }
+                                #endregion Characteristic receiver
+                            }
+                            int maxValue = (numberMeasClause * numberPortChecked);
+                            prgLoad_ValueChange(maxValue, count);
+                            if (reTest)
+                            {
+                                timeout++;
+                                if (timeout == loopTime)
+                                {
+                                    timeout = 0;
+                                    break;
+                                }
+                                deleteListView();
+                            }
+                            else
+                            {
+                                timeout = 0;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            clearFlag = true;
+            BBU.StopProcess();
+            measurementBackgroundWorker.CancelAsync();
+            endingTime = lblRuntime.Text;
+            lblStatusProgress_TextChanged("Đang lưu File kết quả");
+            timerProcess.Stop();
+            ExporttoHtml();
+            ExportListView();
+            lblStatusProgress_TextChanged("Quá trình đo đã kết thúc");
+            txtSerial_TextChanged("");
+            btnConnect_Enable();
+        }
+        private void measurementBackgroundWorker_Completed(object sender, ProgressChangedEventArgs e)
+        {
+
+        }
+
+        #region Testing log
+        //Export result to HTML file
+        public void ExporttoHtml()
+        {
+            try
+            {
+                string directoryPath = @"C:\test3gpp\OQC\32T32R10W\results\htmlfile";
+                if (testingMode == "TX")
+                {
+                    directoryPath = directionPathResults + "Downlink" + "\\" + DateTime.Now.ToString("ddMMyyyy");
+                }
+                else
+                {
+                    directoryPath = directionPathResults + "Uplink" + "\\" + DateTime.Now.ToString("ddMMyyyy");
+                }
+                string filename = rruSerial.Trim() + "_PERFORMANCE-TEST_" + DateTime.Now.ToString("HHmm") + "_" + DateTime.Now.ToString("ddMMyyyy");
+                DirectoryInfo directory = new DirectoryInfo(directoryPath);
+                directory.Create();
+                string resultFile = System.IO.Path.Combine(directoryPath, filename);
+                resultFile = resultFile + ".html";
+                StringBuilder strHTMLBuilder = new StringBuilder();
+                strHTMLBuilder.Append("<html >");
+                strHTMLBuilder.Append("<head >");
+                strHTMLBuilder.Append("<body >");
+                strHTMLBuilder.Append("<table border='1px' cellpadding='1' cellspacing='1' bgcolor='lightyellow' style='font-family:Garamond; font-size:smaller'>");
+                strHTMLBuilder.Append("<tr >");
+                lvwResult.Invoke(new MethodInvoker(delegate ()
+                {
+                    foreach (ColumnHeader ch in lvwResult.Columns)
+                    {
+                        strHTMLBuilder.Append("<td >");
+                        strHTMLBuilder.Append(ch.Text);
+                        strHTMLBuilder.Append("</td>");
+                    }
+                    foreach (ListViewItem lvi in lvwResult.Items)
+                    {
+                        strHTMLBuilder.Append("<tr >");
+                        foreach (ListViewItem.ListViewSubItem lvs in lvi.SubItems)
+                        {
+                            strHTMLBuilder.Append("<td >");
+                            strHTMLBuilder.Append(lvs.Text);
+                            strHTMLBuilder.Append("</td>");
+                        }
+                        strHTMLBuilder.Append("</tr>");
+                    }
+                }));
+                strHTMLBuilder.Append("</tr>");
+                strHTMLBuilder.Append("</table>");
+                strHTMLBuilder.Append("</body>");
+                strHTMLBuilder.Append("</head>");
+                strHTMLBuilder.Append("</html>");
+                string htmltext = strHTMLBuilder.ToString();
+                System.IO.File.WriteAllText(resultFile, htmltext);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+
+            }
+        }
+        public void ExportReport()
+        {
+            try
+            {
+                string flagPassFail = pass;
+                for (int i = 0; i < 32; i++)
+                {
+                    if (dataPout[i, 0] == fail) { flagPassFail = fail; };
+                    if (dataOBW[i, 0] == fail) { flagPassFail = fail; };
+                    if (dataACLR[i, 0, 0] == fail) { flagPassFail = fail; };
+                    if (dataACLR[i, 1, 0] == fail) { flagPassFail = fail; };
+                    if (dataTotalDR[i, 0] == fail) { flagPassFail = fail; };
+                    if (dataSEM[i, 0, 0] == fail) { flagPassFail = fail; };
+                    if (dataSEM[i, 1, 0] == fail) { flagPassFail = fail; };
+                    if (dataTXSUPR[i, 0] == fail) { flagPassFail = fail; };
+                    for (int j = 0; j < 6; j++)
+                    {
+                        if (dataEVM[i, j, 0] == fail) { flagPassFail = fail; };
+                        if (dataFreqErr[i, j, 0] == fail) { flagPassFail = fail; };
+                    }
+
+                    if (dataPsen[i, 0] == fail) { flagPassFail = fail; };
+                    if (dataDR[i, 0] == fail) { flagPassFail = fail; };
+                    if (dataACS[i, 0, 0] == fail) { flagPassFail = fail; };
+                    if (dataINB[i, 0, 0] == fail) { flagPassFail = fail; };
+                    if (dataNBB[i, 0, 0] == fail) { flagPassFail = fail; };
+                    if (dataOBB[i, 0, 0] == fail) { flagPassFail = fail; };
+                    if (dataICS[i, 0] == fail) { flagPassFail = fail; };
+                    if (dataRXIMD[0, i, 0, 0] == fail) { flagPassFail = fail; };
+                    if (dataRXIMD[1, i, 0, 0] == fail) { flagPassFail = fail; };
+                }
+                rruSerial = txtRRUSerial.Text;
+                string resultFile = "";
+                string filename = "";
+                string time = DateTime.Now.ToString("ddMMyyyy");
+                //string directoryPath = @"C:\test3gpp\results\Downlink";
+                string directoryPath = @"C:\test3gpp\OQC\32T32R10W\Report";
+                DirectoryInfo directory = new DirectoryInfo(directoryPath);
+                directory.Create();
+                filename = rruSerial.Trim() + "_PERFORMANCE-TEST_" + DateTime.Now.ToString("HHmm") + "_" + time + "_" + flagPassFail;
+                resultFile = System.IO.Path.Combine(directoryPath, filename);
+                resultFile = resultFile + ".xlsx";
+                if (!File.Exists(resultFile))
+                {
+                    System.IO.File.Copy(@"C:\test3gpp\OQC\32T32R10W\Templates\MRU32T32R_Report_Template_v1_update.xlsx", resultFile);
+                }
+                // Set curor as hoursglass
+                Cursor.Current = Cursors.WaitCursor;
+                Excel.Application xlApp = new Excel.Application();
+                Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(resultFile);
+                Excel._Worksheet worksheet5 = xlWorkbook.Sheets[5]; //worksheet TXRESULT
+                Excel._Worksheet worksheet6 = xlWorkbook.Sheets[6]; //worksheet RXRESULT
+                Excel.Range xlRange = worksheet5.UsedRange;
+                xlApp.Visible = false;
+                xlApp.UserControl = false;
+                if (testingMode == "TX")
+                {
+                    for (int i = 0; i < 32; i++)
+                    {
+                        // Mang data[i,j]
+                        // switch(j)
+                        // j = 0 PASS/FAIL
+                        // j = 1 Time
+                        //j = 2 Result
+                        //dataPout
+                        worksheet5.Cells[i + 1, 5] = dataPout[i, 2];
+                        worksheet5.Cells[i + 1, 8] = dataPout[i, 1]; 
+                        worksheet5.Cells[i + 1, 9] = dataPout[i, 0]; 
+
+                        //dataOBW
+                        worksheet5.Cells[i + 33, 5] = dataOBW[i, 2];                        
+                        worksheet5.Cells[i + 33, 8] = dataOBW[i, 1]; 
+                        worksheet5.Cells[i + 33, 9] = dataOBW[i, 0];
+
+                        //dataACLR
+                        worksheet5.Cells[i + 65, 5] = dataACLR[i, 0, 2];
+                        worksheet5.Cells[i + 65, 8] = dataACLR[i, 0, 1];
+                        worksheet5.Cells[i + 65, 9] = dataACLR[i, 0, 0];
+
+                        worksheet5.Cells[i + 97, 5] = dataACLR[i, 1, 2];
+                        worksheet5.Cells[i + 97, 8] = dataACLR[i, 1, 1];
+                        worksheet5.Cells[i + 97, 9] = dataACLR[i, 1, 0];
+
+                        //dataOBUE
+                        worksheet5.Cells[i + 129, 5] = dataSEM[i, 0, 2];
+                        worksheet5.Cells[i + 129, 8] = dataSEM[i, 0, 1];
+                        worksheet5.Cells[i + 129, 9] = dataSEM[i, 0, 0];
+
+                        worksheet5.Cells[i + 161, 5] = dataSEM[i, 1, 2];
+                        worksheet5.Cells[i + 161, 8] = dataSEM[i, 1, 1];
+                        worksheet5.Cells[i + 161, 9] = dataSEM[i, 1, 0];
+
+                        //dataEVM
+                        for(int j = 0; j < 6; j++)
+                        {
+                            worksheet5.Cells[i + 193 +32*j, 5] = dataEVM[i, j, 2];
+                            worksheet5.Cells[i + 193 + 32*j, 8] = dataEVM[i, j, 1];
+                            worksheet5.Cells[i + 193 + 32*j, 9] = dataEVM[i, j, 0];
+                        }
+
+                        //dataFreqError
+                        for(int j = 0; j < 6; j++)
+                        {
+                            worksheet5.Cells[i + 385 + 32 * j, 5] = dataFreqErr[i, j, 2];
+                            worksheet5.Cells[i + 385 + 32 * j, 8] = dataFreqErr[i, j, 1];
+                            worksheet5.Cells[i + 385 + 32 * j, 9] = dataFreqErr[i, j, 0];
+                        }
+
+                        //DataDynamic
+                        worksheet5.Cells[i + 577, 5] = dataTotalDR[i, 2];
+                        worksheet5.Cells[i + 577, 8] = dataTotalDR[i, 1];
+                        worksheet5.Cells[i + 577, 9] = dataTotalDR[i, 0];
+
+                        //DataOnOffPower
+                        worksheet5.Cells[i + 609, 5] = dataOnOffPower[i, 2];
+                        worksheet5.Cells[i + 609, 8] = dataOnOffPower[i, 1];
+                        worksheet5.Cells[i + 609, 9] = dataOnOffPower[i, 0];
+
+                        //DataOnOffTransient
+                        worksheet5.Cells[i + 641, 5] = dataTransient[i, 2];
+                        worksheet5.Cells[i + 641, 8] = dataTransient[i, 1];
+                        worksheet5.Cells[i + 641, 9] = dataTransient[i, 0];
+
+                        //DataTAE
+                        worksheet5.Cells[i + 673, 5] = dataTAE[i, 2];
+                        worksheet5.Cells[i + 673, 8] = dataTAE[i, 1];
+                        worksheet5.Cells[i + 673, 9] = dataTAE[i, 0];
+                        //DataSpurious
+                        //DataIMD
+                    }
+                    }
+                
+                else if (testingMode == "RX")
+                {
+                        for (int i = 0; i < 32; i++)
+                        {
+                            // Data Psen
+                        //worksheet6.Cells[i + 272, 11] = dataPsen[i, 3];
+                        //worksheet6.Cells[i + 272, 14] = dataPsen[i, 2];
+                        //// Data Dynamic range 
+                        //worksheet6.Cells[i + 280, 11] = dataDR[i, 3];
+                        //worksheet6.Cells[i + 280, 14] = dataDR[i, 2];
+                        //// Data ACS 
+                        //worksheet6.Cells[i + 288, 11] = dataACS[i, 0, 3];
+                        //worksheet6.Cells[i + 288, 14] = dataACS[i, 0, 2];
+                        //// Data In band blocking
+                        //worksheet6.Cells[i + 296, 11] = dataINB[i, 0, 3];
+                        //worksheet6.Cells[i + 296, 14] = dataINB[i, 0, 2];
+                        //// Data Narrow band blocking 
+                        //worksheet6.Cells[i + 304, 11] = dataNBB[i, 0, 3];
+                        //worksheet6.Cells[i + 304, 14] = dataNBB[i, 0, 2];
+                        //// Data out of band blocking
+                        //worksheet6.Cells[i + 312, 11] = dataOBB[i, 0, 3];
+                        //worksheet6.Cells[i + 312, 14] = dataOBB[i, 0, 2];
+                        // Data Receiver S
+                        //worksheetx.Cells[67 + i, 7 - j] = dataICS[i, j];
+                            // Data Gen IMD colum 76
+                           // worksheetx.Cells[76 + i, 7 - j] = dataRXIMD[0, i, 0, j];
+                            // Data Narrowband IMD colum 85
+                            //worksheetx.Cells[85 + i, 7 - j] = dataRXIMD[1, i, 0, j];
+
+                        
+                    }
+                }
+
+                //
+                xlWorkbook.Save();
+                Console.WriteLine(resultFile);
+
+                //cleanup
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+                // release com object to fully kill excel process running in the backgound
+                Marshal.ReleaseComObject(xlRange);
+                Marshal.ReleaseComObject(worksheet5);
+
+                //close and release
+                xlWorkbook.Close();
+                Marshal.ReleaseComObject(xlWorkbook);
+
+                //quit and release
+                xlApp.Quit();
+                Marshal.ReleaseComObject(xlApp);
+
+                //Set cursor as default arrow
+                Cursor.Current = Cursors.Default;
+                lblStatusProgress_TextChanged("Kết quả đo: " + flagPassFail);
+                //uploadtoServer.Send(testingMode, resultFile);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                lblStatusProgress_TextChanged("Save Results: FAIL");
+            }
+        }
+        public void ExportListViewReport()
+        {
+            try
+            {
+                string resultFile = "", filename;
+                string directoryPath = @"C:\test3gpp\OQC\32T32R10W\results";
+                //directoryPath = directoryPath + DateTime.Now.ToString("ddMMyyyy");
+                filename = rruSerial.Trim() + "_PERFORMANCE-TEST_" + DateTime.Now.ToString("HHmm") + "_" + DateTime.Now.ToString("ddMMyyyy");
+                DirectoryInfo directory = new DirectoryInfo(directoryPath);
+                directory.Create();
+                resultFile = System.IO.Path.Combine(directoryPath, filename);
+                resultFile = resultFile + ".xlsx";
+                if (!File.Exists(resultFile))
+                {
+                    System.IO.File.Copy(@"C:\test3gpp\OQC\32T32R10W\Templates\MRU32T32R_Report_Template_v1.0.xlsx", resultFile);
+                }
+                Cursor.Current = Cursors.WaitCursor;
+                Excel.Application xlApp = new Excel.Application();
+                xlApp.Visible = false;
+                xlApp.DisplayAlerts = false;
+                xlApp.UserControl = false;
+                Excel.Workbook xlWorkbook = xlApp.Workbooks.Add(Type.Missing);
+                Excel._Worksheet workSheet6 = xlWorkbook.Sheets[6];
+                workSheet6 = (Excel._Worksheet)xlWorkbook.ActiveSheet;
+                Excel.Range xlRange = workSheet6.UsedRange;
+                workSheet6.Name = "TXRESULT";
+
+                int i = 1;
+                int j = 2;
+                foreach (ColumnHeader ch in lvwResult.Columns)
+                {
+                    workSheet6.Cells[1, i] = ch.Text;
+                    i++;
+                }
+                lvwResult.Invoke(new MethodInvoker(delegate ()
+                {
+                    foreach (ListViewItem lvi in lvwResult.Items)
+                    {
+                        i = 1;
+                        foreach (ListViewItem.ListViewSubItem lvs in lvi.SubItems)
+                        {
+                            workSheet6.Cells[j, i] = lvs.Text;
+                            i++;
+                        }
+                        j++;
+                    }
+                }));
+                workSheet6.Cells.Select();
+                workSheet6.Cells.EntireColumn.AutoFit();
+                xlWorkbook.SaveAs(resultFile);
+                xlApp.Quit();
+                Console.WriteLine(resultFile);
+                //cleanup
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                Marshal.ReleaseComObject(xlRange);
+                Marshal.ReleaseComObject(workSheet6);
+                Marshal.ReleaseComObject(xlWorkbook);
+                Marshal.ReleaseComObject(xlApp);
+            }
+            catch
+            {
+                LogText("Export file fail");
+            }
+        }
+        private void FileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void exportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ExportListView();
+        }
+        public void ExportListView()
+        {
+            try
+            {
+                string resultFile = "", filename;
+                string directoryPath = @"C:\test3gpp\OQC\32T32R10W\results";
+                if (testingMode == "TX")
+                {
+                    directoryPath = directionPathResults + "Downlink" + "\\" + DateTime.Now.ToString("ddMMyyyy");
+                }
+                else
+                {
+                    directoryPath = directionPathResults + "Uplink" + "\\" + DateTime.Now.ToString("ddMMyyyy");
+                }
+                filename = rruSerial.Trim() + "_PERFORMANCE-TEST_" + DateTime.Now.ToString("HHmm") + "_" + DateTime.Now.ToString("ddMMyyyy");
+                DirectoryInfo directory;
+                directory = new DirectoryInfo(directoryPath);
+                directory.Create();
+                resultFile = System.IO.Path.Combine(directoryPath, filename);
+                resultFile = resultFile + ".xlsx";
+                Cursor.Current = Cursors.WaitCursor;
+                Excel.Application xlApp = new Excel.Application();
+                xlApp.Visible = false;
+                xlApp.DisplayAlerts = false;
+                xlApp.UserControl = false;
+                Excel.Workbook xlWorkbook = xlApp.Workbooks.Add(Type.Missing);
+                Excel._Worksheet workSheet1 = xlWorkbook.Sheets[1];
+                workSheet1 = (Excel._Worksheet)xlWorkbook.ActiveSheet;
+                Excel.Range xlRange = workSheet1.UsedRange;
+                workSheet1.Name = "sheet1";
+
+                int i = 1;
+                int j = 2;
+                foreach (ColumnHeader ch in lvwResult.Columns)
+                {
+                    workSheet1.Cells[1, i] = ch.Text;
+                    i++;
+                }
+                lvwResult.Invoke(new MethodInvoker(delegate ()
+                {
+                    foreach (ListViewItem lvi in lvwResult.Items)
+                    {
+                        i = 1;
+<<<<<<< HEAD
+                        {
+                            foreach (ListViewItem.ListViewSubItem lvs in lvi.SubItems)
+                            {
+                                workSheet1.Cells[j, i] = lvs.Text;
+                                i++;
+                            }
+                            j++;
+                        }
+                    }
+                }));
+                    workSheet1.Cells.Select();
+                    workSheet1.Cells.EntireColumn.AutoFit();
+                    xlWorkbook.SaveAs(resultFile);
+                    xlApp.Quit();
+                    Console.WriteLine(resultFile);
+                    //cleanup
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    Marshal.ReleaseComObject(xlRange);
+                    Marshal.ReleaseComObject(workSheet1);
+                    Marshal.ReleaseComObject(xlWorkbook);
+                    Marshal.ReleaseComObject(xlApp);
+                }
+=======
+                        foreach (ListViewItem.ListViewSubItem lvs in lvi.SubItems)
+                        {
+                            workSheet1.Cells[j, i] = lvs.Text;
+                            i++;
+                        }
+                        j++;
+                    }
+                }));
+                workSheet1.Cells.Select();
+                workSheet1.Cells.EntireColumn.AutoFit();
+                xlWorkbook.SaveAs(resultFile);
+                xlApp.Quit();
+                Console.WriteLine(resultFile);
+                //cleanup
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                Marshal.ReleaseComObject(xlRange);
+                Marshal.ReleaseComObject(workSheet1);
+                Marshal.ReleaseComObject(xlWorkbook);
+                Marshal.ReleaseComObject(xlApp);
+                ExporttoHtml();
+            }
+>>>>>>> report
+            catch
+            {
+                LogText("Export file fail");
+            }
+        }
+
+        public void LogText(string text)
+        {
+            Console.WriteLine(text);
+            string time = DateTime.Now.ToString("ddMMyyyy");
+            string directoryPath = directionPathTemplate + "logs" + "\\" + time;
+            DirectoryInfo directory = new DirectoryInfo(directoryPath);
+            directory.Create();
+            string filepath = directoryPath + "\\" + rruSerial.Trim() + "_" + time + ".txt";
+            FileStream fs = new FileStream(filepath, FileMode.Append);
+            StreamWriter sWriter = new StreamWriter(fs, Encoding.UTF8);
+            sWriter.WriteLine(DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + ": " + text);
+            sWriter.Flush();
+            fs.Close();
+        }
+        public void DLCsvRecord(string[] data, object[] value, string[] result, string mode, string TM, int nvalue, int nresult, int port)
+        {
+            // data[]: la mang HEADER cua log VSA
+            // value[]: la mang ket qua cua VSA tra ve
+            // result[]: mang ket qua so sanh gia tri xau nhat
+            // nvalue: so luong ket qua may do tra ve tuy moi bai do
+            // nresult: so luong ket qua tuy moi bai do
+
+            string time = DateTime.Now.ToString("ddMMyyyy");
+            string directoryPath = @"C:\test3gpp\OQC\32T32R10W\logs\csv\" + "\\" + time;
+            DirectoryInfo directory = new DirectoryInfo(directoryPath);
+            directory.Create();
+            string filepath = directoryPath + "\\" + rruSerial + "_" + mode + ".csv";
+            bool fileExists = File.Exists(filepath);
+            using (StreamWriter sw = new StreamWriter(filepath, true))
+            {
+                if (!fileExists)
+                {
+                    // Ghi các tên cột vào tệp nếu tệp chưa tồn tại
+                    string[] header = new string[8] { "DATE", "TIME", "TYPE OF RRU", "CONFIG POWER", "FREQUENCY(MHz)", "MODE", "PORT", "TEST MODEL" };
+
+                    for (int i = 0; i < 8; i++)
+                    {
+                        sw.Write(header[i] + ",");
+
+                    }
+                    for (int i = 0; i < (nvalue + nresult); i++)
+                    {
+                        sw.Write(data[i] + ",");
+                    }
+                }
+                // Ghi dòng dữ liệu mới vào tệp
+                try
+                {
+                    sw.Write("\n" + DateTime.Now.ToString("ddMMyyyy") + ",");
+                    sw.Write(DateTime.Now.ToString("HH:mm:ss") + ",");
+                    sw.Write("Pluto" + ",");
+                    sw.Write(txtPower.Text + ",");
+                    sw.Write(txtFrequency.Text + ",");
+                    sw.Write(mode + ",");
+                    sw.Write(port.ToString() + ",");
+                    sw.Write(TM + ",");
+                    for (int i = 0; i < nvalue; i++)
+                    {
+                        sw.Write(value[i].ToString() + ",");
+
+                    }
+                    for (int i = 0; i < nresult; i++)
+                    {
+                        sw.Write(result[i].ToString() + ",");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+
+        private void ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            frmRRU.ShowDialog();
+        }
+        public void csvRecord(string mode, string port, string wsFreq, string wsPower, string isFreq, string isPower, string cwFreq, string cwPower, string throughput)
+        {
+            string time = DateTime.Now.ToString("ddMMyyyy");
+            string directoryPath = directionPathTemplate + "logs" + "\\" + time;
+            DirectoryInfo directory = new DirectoryInfo(directoryPath);
+            directory.Create();
+            string filepath = directoryPath + "\\" + "log_uplink_" + rruSerial.Trim() + "_" + time + ".csv";
+            if (!File.Exists(filepath))
+            {
+                FileStream fs = new FileStream(filepath, FileMode.Append);
+                StreamWriter sWriter = new StreamWriter(fs, Encoding.UTF8);
+                sWriter.WriteLine("Date" + "," + "Time" + "," + "Type of RRU" + "," + "Bandwidth" + "," + "Mode" + "," + "Port" + "," + "Wanted Frequency" + "," + "Wanted Power" + "," + "Interference Frequency" + "," + "Interferance Power" + "," + "CW Frequency" + "," + "CW Power" + "," + "Throughput");
+                sWriter.Flush();
+                sWriter.Close();
+            }
+            else
+            {
+                FileStream fs = new FileStream(filepath, FileMode.Append); // Open if it's exist or create file
+                StreamWriter sWriter = new StreamWriter(fs, Encoding.UTF8);
+                sWriter.WriteLine(DateTime.Now.ToString("yyyy-MM-dd") + "," + DateTime.Now.ToString("hh:mm:ss") + "," + "8T8R" + "," + setBandwidth + "," + mode + "," + "Port" + port + "," + wsFreq + "," + wsPower + "," + isFreq + "," + isPower + "," + cwFreq + "," + cwPower + "," + throughput);
+                sWriter.Flush();
+                sWriter.Close();
+            }
+        }
+
+        public void ListViewShow(string switchRF, string Clause, string Spec, string limitMin, string result, string limitMax, string NRTM, string PassFail, string note)
+        {
+            count++;
+            System.Threading.Thread.Sleep(200);
+            ListView lvwresult = lvwResult;
+            ListViewItem item = new ListViewItem();
+            lvwResult.Invoke(new MethodInvoker(delegate ()
+            {
+                item.Text = switchRF;
+                item.SubItems.Add(Clause);
+                item.SubItems.Add(Spec);
+                item.SubItems.Add(limitMin);
+                item.SubItems.Add(result);
+                item.SubItems.Add(limitMax);
+                item.SubItems.Add(NRTM);
+                //item.SubItems.Add(note);
+                lvwresult.Items.Add(item);
+                item.SubItems.Add(DateTime.Now.ToString("hh:mm:ss"));
+                if (PassFail == pass)
+                {
+                    item.SubItems.Add(pass);
+                    item.BackColor = Color.Green;
+                }
+                else
+                {
+                    item.SubItems.Add(fail);
+                    item.BackColor = Color.Red;
+                }
+                lvwResult.Items[lvwResult.Items.Count - 1].EnsureVisible();
+                System.Windows.Forms.Application.DoEvents();
+            }));
+        }
+        public void deleteListView()
+        {
+            ListView lvwresult = lvwResult;
+            ListViewItem item = new ListViewItem();
+            lvwresult.Invoke(new MethodInvoker(delegate ()
+            {
+                lvwresult.Items[lvwResult.Items.Count - 1].Remove();
+            }
+            ));
+        }
+        #endregion
+
+        #region connect to server
+        public void Connect2Server()
+        {
+            try
+            {
+
+            }
+            catch
+            {
+
+            }
+        }
+        public void GetSerial()
+        {
+
+        }
+        #endregion
+
+        //==========================================================================
+
+        //++++++++++++++++++ LIST VIEW +++++++++++++++++++++++++++++++++++++++++
+
+        // LIST VIEW STATUS
+
+        //setStatusLogs
+        //
+
+        //
+
+        //==========================================================================
+
+        //++++++++++++++++++ VOID FUNCTION +++++++++++++++++++++++++++++++++++++++++
+        //VSG1Connection
+        //
+        public void VSG1Connection(string IP1, string Cmd1, string instrument1, out string manufacturer1, out string model1, out string serial1)
+        {
+            VSG1.Instrument(instrument1);
+            VSG1.Connection(IP1, Cmd1, out manufacturer1, out model1, out serial1);
+        }
+
+        private void txtRRUSerial_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort20_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort17_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort18_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort19_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort21_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort22_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort23_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort24_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort27_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort28_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort26_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort25_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chkPort29_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        //VSG2Connection
+        //
+        public void VSG2Connection(string IP2, string Cmd2, string instrument2, out string manufacturer2, out string model2, out string serial2)
+        {
+            VSG2.Instrument(instrument2);
+            VSG2.Connection(IP2, Cmd2, out manufacturer2, out model2, out serial2);
+        }
+
+        private void DUToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            frmBBU.flagConn(statusBBU);
+            frmBBU.ShowDialog();
+            frmBBU.statusConnection(out ipBBU, out statusBBU);
+        }
+
+        private void Form5GAT_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (MessageBox.Show(this, "Bạn có thật sự muốn thoát chương trình?", "Thông báo", MessageBoxButtons.OKCancel) != System.Windows.Forms.DialogResult.OK)
+            {
+                e.Cancel = true;
+            }
+        }
+
+        private void tsmiExport_Click(object sender, EventArgs e)
+        {
+            ExportReport();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            BBU.PREPARE_CALIB_RRU("1", "25000");
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            bool flagConnected;
+            BBU.loginOAM("192.168.120.187", 1969, out flagConnected);
+        }
+
+        private void txtPWR_TextChanged(object sender, EventArgs e)
+        {
+            if (Int32.Parse(txtPWR.Text) < 1000 || Int32.Parse(txtPWR.Text) > 40000)
+            {
+                MessageBox.Show("Giá trị công suất nằm ngoài dải cho phép", "Thông báo");
+                txtPWR.Text = "40000";
+            }
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            string[] noise = new string[8];
+            BBU.Noise(out noise);
+        }
+        //VSG3Connection
+        //
+        public void VSG3Connection(string IP3, string Cmd3, string instrument3, out string manufacturer3, out string model3, out string serial3)
+        {
+            VSG3.Instrument(instrument3);
+            VSG3.Connection(IP3, Cmd3, out manufacturer3, out model3, out serial3);
+        }
+
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            ClearResult();
+        }
+
+        private void Form5GAT_Load(object sender, EventArgs e)
+        {
+            string filename = directionPathTemplate + "OQC_DL_SETUP_3GPP.xlsx";
+            string textFile = directionPathTemplate + "config.txt";
+            testingMode = "TX";
+            try
+            {
+                string[] text = new string[File.ReadAllLines(textFile).Length];
+                text = File.ReadAllLines(textFile);
+                ipBBU = text[0].Substring(text[0].IndexOf(":") + 1).Trim();
+                frmBBU.updateIP(ipBBU);
+                ipRFS1 = text[1].Substring(text[1].IndexOf(":") + 1).Trim();
+                ipRFS2 = text[2].Substring(text[2].IndexOf(":") + 1).Trim();
+                ipRFS3 = text[3].Substring(text[3].IndexOf(":") + 1).Trim();
+                frmRFSwitch.updateIP(ipRFS1, ipRFS2, ipRFS3);
+                ipVSG1 = text[4].Substring(text[4].IndexOf(":") + 1).Trim();
+                ipVSG2 = text[5].Substring(text[5].IndexOf(":") + 1).Trim();
+                ipVSG3 = text[6].Substring(text[6].IndexOf(":") + 1).Trim();
+                frmVSG.updateIP(ipVSG1, ipVSG2, ipVSG3);
+                string VSA_name = text[7].Substring(text[7].IndexOf(":") + 1).Trim();
+                ipVSA = text[8].Substring(text[8].IndexOf(":") + 1).Trim();
+                frmVSA.updateIP(VSA_name, ipVSA);
+                OpenFileData(filename);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void diagramsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Chapter6_1 fm = new Chapter6_1();
+            fm.ShowDialog();
+        }
+
+        public void VSGSendCmd(string vsg, string Cmd, out string respond)
+        {
+            if (vsg == "VSG1")
+            {
+                VSG1.SendCmd(Cmd, out respond);
+            }
+            else if (vsg == "VSG2")
+            {
+                VSG2.SendCmd(Cmd, out respond);
+            }
+            else if (vsg == "VSG3")
+            {
+                VSG3.SendCmd(Cmd, out respond);
+            }
+            else
+            {
+                respond = error;
+            }
+        }
+        public void VSGD1isconnect()
+        {
+            VSG1.Disconnect();
+        }
+        public void VSGD2isconnect()
+        {
+            VSG1.Disconnect();
+            VSG2.Disconnect();
+        }
+        public void VSGD3isconnect()
+        {
+            VSG1.Disconnect();
+            VSG2.Disconnect();
+            VSG3.Disconnect();
+        }
+        //VSAConnection
+        //
+        public void VSAConnection(string IP, string Cmd, string instrument, out string manufacturer, out string model, out string serial)
+        {
+            VSA.Instrument(instrument);
+            VSA.Connection(IP, Cmd, out manufacturer, out model, out serial);
+            if (instrument == "FSV3030")
+            {
+
+            }
+        }
+        public void VSADisconnect()
+        {
+            VSA.Disconnect();
+        }
+        //
+        //RFSwitchConnCheck
+        //
+
+        public void RFSwitchConnection1(string IP, int port, out bool rfsFlagconnect)
+        {
+            rfSwitch1.Connection(IP, port, out rfsFlagconnect);
+        }
+        public void RFSwitchConnection2(string IP, int port, out bool rfsFlagconnect)
+        {
+            rfSwitch2.Connection(IP, port, out rfsFlagconnect);
+        }
+        public void RFSwitchConnection3(string IP, int port, out bool rfsFlagconnect)
+        {
+            rfSwitch3.Connection(IP, port, out rfsFlagconnect);
+        }
+
+        public void SetSwitchRFS1(string Aport, string Nport, out string Respon)
+        {
+            rfSwitch1.SetSwitch(Aport, Nport, out Respon);
+        }
+        public void SetSwitchRFS2(string Aport, string Nport, out string Respon)
+        {
+            rfSwitch2.SetSwitch(Aport, Nport, out Respon);
+        }
+        public void SetSwitchRFS3(string Aport, string Nport, out string Respon)
+        {
+            rfSwitch3.SetSwitch(Aport, Nport, out Respon);
+        }
+        //TimerMeasurementProgress
+        //
+        private void timerProcess_Tick(object sender, EventArgs e)
+        {
+            time++;
+            TimeSpan timeCount = TimeSpan.FromSeconds(time);
+            lblRuntime.Text = timeCount.ToString();
+        }
+        //
+        //Swap function
+        //
+        public void Swap(string[,] x, int i)
+        {
+            string[,] temp = new string[1, 9];
+            for (int j = 0; j < 9; j++)
+            {
+                temp[0, j] = x[i, j];
+                x[i, j] = x[i + 1, j];
+                x[i + 1, j] = temp[0, j];
+
+            }
+        }
+        public void BBUConnection(string instrument, string IP, string User, string Pass, out bool connStatus)
+        {
+            BBU.BBUVersion(instrument);
+            BBU.Connection(IP, User, Pass, out connStatus);
+        }
+        public void RRUConnection(string IP, string Username, string Password, out bool flagCon)
+        {
+            RRU.Connection(IP, Username, Password, out flagCon);
+        }
+    }
+}

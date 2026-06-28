@@ -1,0 +1,448 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Clawfoot.Core</name>
+    </assembly>
+    <members>
+        <member name="T:Clawfoot.Core.Enums.AutomapperConfigType">
+            <summary>
+            The configuration type for an automapper config
+            </summary>
+        </member>
+        <member name="F:Clawfoot.Core.Enums.AutomapperConfigType.Default">
+            <summary>
+            The defualt configuration type for the model
+            </summary>
+        </member>
+        <member name="F:Clawfoot.Core.Enums.AutomapperConfigType.NoExpandedRelations">
+            <summary>
+            A config type that will not expand entity relations when mapping
+            </summary>
+        </member>
+        <member name="T:Clawfoot.Core.Enums.CollectionExpressionType">
+            <summary>
+            Collection expression type used in ExpressionBuilders
+            </summary>
+        </member>
+        <member name="F:Clawfoot.Core.Enums.CollectionExpressionType.Contains">
+            <summary>
+            A Contains() expression
+            </summary>
+        </member>
+        <member name="T:Clawfoot.Core.Enums.ServiceTypes">
+            <summary>
+            Service types provided by Clawfoot projects
+            Intended for use when registering with a <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> DI container
+            </summary>
+        </member>
+        <member name="T:Clawfoot.Core.Enums.RelativeHandedSide">
+            <summary>
+            The relative Left or Right hand side
+            </summary>
+        </member>
+        <member name="M:Clawfoot.Core.Interfaces.ICrudService.EntityExists(System.Object,System.Type)">
+            <summary>
+            Determines if the entity with the given type and key exists in the context
+            </summary>
+            <param name="key">The entity key</param>
+            <param name="entityOrDto">The type of the entity or DTO that impliments <see cref="T:Clawfoot.Core.Interfaces.ILinkToEntity`1"/></param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Interfaces.ICrudService.ReadMany``1(System.Boolean)">
+            <summary>
+            Reads all entites of <typeparamref name="T"/> that exist in the database
+            Use with discression
+            </summary>
+            <typeparam name="T">The entity or Dto type</typeparam>
+            <param name="expandRelations">Will only expand relations if this is a DTO</param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Interfaces.ICrudService.ReadSingle``1(System.Object,System.Boolean)">
+            <summary>
+            This reads a single entity or DTO
+            </summary>
+            <typeparam name="T">This should either be an entity class or a DTO which has a <see cref="T:Clawfoot.Core.Interfaces.ILinkToEntity`1"/> interface</typeparam>
+            <param name="key">The Entities key</param>
+            <param name="expandRelations">Whether the relations for this entity should be loaded</param>
+            <returns>The single entity or DTO that was found by the keys. If its an entity class then it is tracked</returns>
+        </member>
+        <member name="M:Clawfoot.Core.Interfaces.ICrudService.ReadSingle``1(System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}},System.Boolean)">
+            <summary>
+            This reads a single entity or DTO using a where clause
+            </summary>
+            <typeparam name="T">This should either be an entity class or a DTO which has a <see cref="T:Clawfoot.Core.Interfaces.ILinkToEntity`1"/> interface</typeparam>
+            <param name="whereExpression">The where expression should return a single instance </param>
+            <param name="expandRelations">Whether the relations for this entity should be loaded</param>
+            <returns>The single entity or DTO that was found by the where clause. If its an entity class then it is tracked</returns>
+        </member>
+        <member name="M:Clawfoot.Core.Interfaces.ICrudService.CreateAndSave``1(``0)">
+            <summary>
+            This will create a new entity in the database. If you provide class which is an entity class (i.e. in your EF Core database) then
+            the method will add, and then call SaveChanges. If the class you provide is a DTO which has a <see cref="T:Clawfoot.Core.Interfaces.ILinkToEntity`1"/> interface
+            it will use that to create the entity with AutoMapper
+            </summary>
+            <typeparam name="T">This type is found from the input instance</typeparam>
+            <param name="entityOrDto">This should either be an instance of a entity class or a DTO which has a <see cref="T:Clawfoot.Core.Interfaces.ILinkToEntity`1"/> interface</param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Interfaces.ICrudService.UpdateAndSave``1(``0)">
+            <summary>
+            This will update the entity referred to by the keys in the given class instance.
+            For a entity class instance it will check the state of the instance. If its detached it will call Update, otherwise it assumes its tracked and calls SaveChanges
+            For a DTO it will: 
+            a) load the existing entity class using the primary key(s) in the DTO
+            b) Try to copy the data over with AutoMapper
+            c) Call SaveChanges
+            </summary>
+            <typeparam name="T">This type is found from the input instance</typeparam>
+            <param name="entityOrDto">This should either be an instance of a entity class or a DTO which has a <see cref="T:Clawfoot.Core.Interfaces.ILinkToEntity`1"/> interface</param>
+        </member>
+        <member name="M:Clawfoot.Core.Interfaces.ICrudService.CreateOrUpdateAndSave``1(``0,System.Boolean@)">
+            <summary>
+            This will update the entity referred to by the keys in the given class instance. If the entity doe snot exist it will create it.
+            For a entity class instance it will check the state of the instance. If its detached it will call Update, otherwise it assumes its tracked and calls SaveChanges
+            For a DTO it will: 
+            a) load the existing entity class using the primary key(s) in the DTO
+            b) Try to copy the data over with AutoMapper
+            c) Call SaveChanges
+            </summary>
+            <typeparam name="T">This type is found from the input instance</typeparam>
+            <param name="entityOrDto">This should either be an instance of a entity class or a DTO which has a <see cref="T:Clawfoot.Core.Interfaces.ILinkToEntity`1"/> interface</param>
+            <param name="updated">If the Entity was updated or not</param>
+        </member>
+        <member name="M:Clawfoot.Core.Interfaces.ICrudService.DeleteAndSave``1(System.Object)">
+            <summary>
+            This will delete the entity class with the given primary key
+            </summary>
+            <typeparam name="T">The entity or model class you want to delete.</typeparam>
+            <param name="key"></param>
+        </member>
+        <member name="T:Clawfoot.Core.Interfaces.IEntity">
+            <summary>
+            An entity
+            </summary>
+        </member>
+        <member name="T:Clawfoot.Core.Interfaces.ILinkToEntity`1">
+            <summary>
+            Compile-time marker interface, no need for methods
+            This lets the services know which entity class to map the DTO to
+            </summary>
+        </member>
+        <member name="T:Clawfoot.Core.Interfaces.ILinkToEntity">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Clawfoot.Core.Interfaces.IModel">
+            <summary>
+            Marker Interface
+            To create a type constraint for methods/classes with IEntity and ILinkToEntity
+            </summary>
+        </member>
+        <member name="T:Clawfoot.Core.KeyPair`2">
+            <summary>
+            Represents a pair of keys that are related to each other and are not necessarily a key/value pair.
+            Used within the IndexedKeyMap
+            </summary>
+            <typeparam name="TKey1"></typeparam>
+            <typeparam name="TKey2"></typeparam>
+        </member>
+        <member name="P:Clawfoot.Core.Status.IGenericStatus.Errors">
+            <summary>
+            The list of errors of this status
+            </summary>
+        </member>
+        <member name="P:Clawfoot.Core.Status.IGenericStatus.Exceptions">
+            <summary>
+            The list of exceptions contained in this status
+            </summary>
+        </member>
+        <member name="P:Clawfoot.Core.Status.IGenericStatus.Success">
+            <summary>
+            If there are no errors this is true
+            </summary>
+        </member>
+        <member name="P:Clawfoot.Core.Status.IGenericStatus.HasErrors">
+            <summary>
+            If there are errors this is true
+            </summary>
+        </member>
+        <member name="P:Clawfoot.Core.Status.IGenericStatus.HasExceptions">
+            <summary>
+            If the status contains exceptions
+            </summary>
+        </member>
+        <member name="P:Clawfoot.Core.Status.IGenericStatus.Message">
+            <summary>
+            The message of this status, does not combine error messages. Use ToString() instead
+            </summary>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.AsGeneric``1">
+            <summary>
+            Converts this <see cref="T:Clawfoot.Core.Status.IGenericStatus"/> into an <see cref="T:Clawfoot.Core.Status.IGenericStatus`1"/>
+            </summary>
+            <typeparam name="T">The Generic Type for the returned status</typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.SetResult``1(``0)">
+            <summary>
+            Creates a <see cref="T:Clawfoot.Core.Status.IGenericStatus`1"/>, merges this status into it, and sets the result
+            </summary>
+            <typeparam name="T"></typeparam>
+            /// <param name="result"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.MergeStatuses(Clawfoot.Core.Status.IGenericStatus)">
+            <summary>
+            Will combine the errors and exceptions of the provided status with this status. 
+            If the provided status has a different success message, and no errors, replaces this statuses success message with the provided status.
+            Returns this status
+            </summary>
+            <param name="status">The status to merge into this status</param>
+            <returns>This status</returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.MergeIntoStatus(Clawfoot.Core.Status.IGenericStatus)">
+            <summary>
+            Will combine the errors and exceptions of this status into the provided status.
+            Returns the provided status
+            </summary>
+            <param name="status">The status to merge into</param>
+            <returns>The provided status</returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.ToString(System.String)">
+            <summary>
+            Combines all error messages into a single string
+            </summary>
+            <param name="seperator"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.ToUserFriendlyString(System.String)">
+            <summary>
+            Combines all user-friendly error messages into a single string
+            </summary>
+            <param name="seperator"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.AddException(System.Exception)">
+            <summary>
+            Adds the provided exception to the status.
+            This also adds the exception message as <see langword="abstract"/>new error
+            </summary>
+            <param name="ex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.AddError(System.String,System.String)">
+            <summary>
+            Adds a new error to the status
+            </summary>
+            <param name="message">The error message</param>
+            <param name="userMessage">The user friendly error message</param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.AddErrorIfNull``1(``0,System.String,System.String)">
+            <summary>
+            Adds a new error to the status if the item is null
+            </summary>
+            <remarks>This only accepts reference types</remarks>
+            <param name="value">>The value that is checked</param>
+            <param name="message">The error message</param>
+            <param name="userMessage">The user friendly error message</param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.AddErrorIfNull``1(System.Nullable{``0},System.String,System.String)">
+            <summary>
+            Adds a new error to the status if the item is null
+            </summary>
+            <remarks>This only accepts structs that implement <see cref="T:System.Nullable`1"/></remarks>
+            <param name="value">>The nullable value that is checked</param>
+            <param name="message">The error message</param>
+            <param name="userMessage">The user friendly error message</param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.AddErrorIfNullOrDefault``1(``0,System.String,System.String)">
+            <summary>
+            Adds a new error to the status if the item is null or is default(T)
+            </summary>
+            <remarks>This only accepts reference types</remarks>
+            <param name="value">>The value that is checked</param>
+            <param name="message">The error message</param>
+            <param name="userMessage">The user friendly error message</param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.AddErrorIfNullOrDefault``1(System.Nullable{``0},System.String,System.String)">
+            <summary>
+            Adds a new error to the status if the item is null or is default(T)
+            </summary>
+            <remarks>This only accepts structs that implement <see cref="T:System.Nullable`1"/></remarks>
+            <param name="value">>The nullable value that is checked</param>
+            <param name="message">The error message</param>
+            <param name="userMessage">The user friendly error message</param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.Invoke(System.Action,System.Boolean)">
+            <summary>
+            Invokes the delegate, and if it throws an exception, records it in the current status.
+            Returns this status
+            </summary>
+            <param name="action"></param>
+            <param name="keepException"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.Invoke``1(System.Action{``0},``0,System.Boolean)">
+            <summary>
+            Invokes the delegate, and if it throws an exception, records it in the current status.
+            Returns this status
+            </summary>
+            <param name="action"></param>
+            <param name="keepException"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.InvokeAndMergeStatus(System.Func{Clawfoot.Core.Status.IGenericStatus},System.Boolean)">
+            <summary>
+            Invokes the delegate that returns an <see cref="T:Clawfoot.Core.Status.IGenericStatus"/>, and merges that result status into this status
+            If an exception occurs, records that exception in this status.
+            Returns this status
+            </summary>
+            <param name="func"></param>
+            <param name="keepException"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.InvokeMergeStatusAndReturnResult``1(System.Func{Clawfoot.Core.Status.IGenericStatus{``0}},System.Boolean)">
+            <summary>
+            Invokes the delegate that returns an <see cref="T:Clawfoot.Core.Status.IGenericStatus`1"/>, merges that result status into this status, and returns the TResult result
+            If an exception occurs, records that exception in this status and returns default(TResult).
+            Returns this status
+            </summary>
+            <param name="func"></param>
+            <param name="keepException"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus.InvokeAndReturnResult``1(System.Func{``0},System.Boolean)">
+            <summary>
+            Invokes the delegate, and if it throws an exception, records it in the current status and returns default(TResult).
+            If success, return the result of the delegate
+            </summary>
+            <typeparam name="TResult">The output type</typeparam>
+            <param name="func">The delegate</param>
+            <param name="keepException">To keep the exception in the status, or just record the error message</param>
+            <returns></returns>
+        </member>
+        <member name="P:Clawfoot.Core.Status.IGenericStatus`1.Result">
+            <summary>
+            The return result, or if there are errors it will return default(T)
+            </summary>
+        </member>
+        <member name="P:Clawfoot.Core.Status.IGenericStatus`1.HasResult">
+            <summary>
+            If this status has a result.
+            Returns false if there are errors, even if a result has been set
+            </summary>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.SetResult(`0)">
+            <summary>
+            Sets the result of the status
+            </summary>
+            <param name="result"></param>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.AddError(System.String,System.String)">
+            <summary>
+            Adds a new error to the status
+            </summary>
+            <param name="message">The error message</param>
+            <param name="userMessage">The user friendly error message</param>
+            <returns>This status</returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.AddErrorIfNull``1(``0,System.String,System.String)">
+            <summary>
+            Adds a new error to the status if the item is null
+            </summary>
+            <remarks>This only accepts reference types</remarks>
+            <param name="value">>The value that is checked</param>
+            <param name="message">The error message</param>
+            <param name="userMessage">The user friendly error message</param>
+            <returns>This status</returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.AddErrorIfNull``1(System.Nullable{``0},System.String,System.String)">
+            <summary>
+            Adds a new error to the status if the item is null
+            </summary>
+            <remarks>This only accepts structs that implement <see cref="T:System.Nullable`1"/></remarks>
+            <param name="value">>The nullable value that is checked</param>
+            <param name="message">The error message</param>
+            <param name="userMessage">The user friendly error message</param>
+            <returns>This status</returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.AddErrorIfNullOrDefault``1(``0,System.String,System.String)">
+            <summary>
+            Adds a new error to the status if the item is null or is default(T)
+            </summary>
+            <remarks>This only accepts reference types</remarks>
+            <param name="value">>The value that is checked</param>
+            <param name="message">The error message</param>
+            <param name="userMessage">The user friendly error message</param>
+            <returns>This status</returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.AddErrorIfNullOrDefault``1(System.Nullable{``0},System.String,System.String)">
+            <summary>
+            Adds a new error to the status if the item is null or is default(T)
+            </summary>
+            <remarks>This only accepts structs that implement <see cref="T:System.Nullable`1"/></remarks>
+            <param name="value">>The nullable value that is checked</param>
+            <param name="message">The error message</param>
+            <param name="userMessage">The user friendly error message</param>
+            <returns>This status</returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.MergeStatuses(Clawfoot.Core.Status.IGenericStatus{`0})">
+            <summary>
+            Will combine the result, errors, and exceptions of the provided status with this status. 
+            If the provided status has a different success message, and no errors, replaces this statuses success message with the provided status.
+            Will prioritize keeping the status result that exists. If this status doesn't have a result, and the provided status doe, will keep the provided result.
+            If both statuses have a result, this will prioritize the current statuses result over the provided status.
+            Returns this status
+            </summary>
+            <param name="status">The status to merge into this status</param>
+            <returns>This status</returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.MergeIntoStatus(Clawfoot.Core.Status.IGenericStatus{`0})">
+            <summary>
+            Will combine the errors, exceptions, and result of this status into the provided status using <see cref="M:Clawfoot.Core.Status.IGenericStatus`1.MergeStatuses(Clawfoot.Core.Status.IGenericStatus{`0})"/>.
+            Returns the provided status
+            </summary>
+            <param name="status">The status to merge into</param>
+            <returns>The provided status</returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.MergeIntoStatusAndReturnResult(Clawfoot.Core.Status.IGenericStatus)">
+            <summary>
+            Will combine the errors and exceptions of this status into the provided status using <see cref="M:Clawfoot.Core.Status.IGenericStatus.MergeStatuses(Clawfoot.Core.Status.IGenericStatus)"/>.
+            Returns the result of this status
+            </summary>
+            <param name="status"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.MergeIntoStatusAndReturnResult(Clawfoot.Core.Status.IGenericStatus{`0})">
+            <summary>
+            Will combine the errors, exceptions, and result of this status into the provided status using <see cref="M:Clawfoot.Core.Status.IGenericStatus`1.MergeStatuses(Clawfoot.Core.Status.IGenericStatus{`0})"/>.
+            Returns the result of this status
+            </summary>
+            <param name="status"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.ConvertTo``1(``0)">
+            <summary>
+            Converts this generic status to one with the provided result type
+            Used by the MapTo exxtension method
+            </summary>
+            <typeparam name="TResult"></typeparam>
+            <param name="result"></param>
+        </member>
+        <member name="M:Clawfoot.Core.Status.IGenericStatus`1.InvokeAndSetResult(System.Func{`0},System.Boolean)">
+            <summary>
+            Invokes the delegate, and if it throws an exception, records it in the current status and returns null.
+            If success, sets the status result, and returns the result of the delegate
+            </summary>
+            <param name="func"></param>
+            <param name="keepException"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
