@@ -86,6 +86,10 @@
             this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.chkPath4 = new System.Windows.Forms.CheckBox();
+            this.chkPath3 = new System.Windows.Forms.CheckBox();
+            this.chkPath2 = new System.Windows.Forms.CheckBox();
+            this.chkPath1 = new System.Windows.Forms.CheckBox();
             this.ckbMuitlMeas = new System.Windows.Forms.CheckBox();
             this.chkPort32 = new System.Windows.Forms.CheckBox();
             this.chkPort31 = new System.Windows.Forms.CheckBox();
@@ -245,48 +249,48 @@
             this.AttenuatorToolStripMenuItem,
             this.toolStripMenuItem1});
             this.InstrumentToolStripMenuItem.Name = "InstrumentToolStripMenuItem";
-            this.InstrumentToolStripMenuItem.Size = new System.Drawing.Size(90, 20);
+            this.InstrumentToolStripMenuItem.Size = new System.Drawing.Size(92, 20);
             this.InstrumentToolStripMenuItem.Text = "INSTRUMENT";
             // 
             // VSAToolStripMenuItem
             // 
             this.VSAToolStripMenuItem.Name = "VSAToolStripMenuItem";
-            this.VSAToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.VSAToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.VSAToolStripMenuItem.Text = "VSA";
             this.VSAToolStripMenuItem.Click += new System.EventHandler(this.VSAToolStripMenuItem_Click);
             // 
             // VSGToolStripMenuItem
             // 
             this.VSGToolStripMenuItem.Name = "VSGToolStripMenuItem";
-            this.VSGToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.VSGToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.VSGToolStripMenuItem.Text = "VSG";
             this.VSGToolStripMenuItem.Click += new System.EventHandler(this.VSGToolStripMenuItem_Click);
             // 
             // DUToolStripMenuItem
             // 
             this.DUToolStripMenuItem.Name = "DUToolStripMenuItem";
-            this.DUToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.DUToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.DUToolStripMenuItem.Text = "DU";
             this.DUToolStripMenuItem.Click += new System.EventHandler(this.DUToolStripMenuItem_Click);
             // 
             // RFSwitchToolStripMenuItem
             // 
             this.RFSwitchToolStripMenuItem.Name = "RFSwitchToolStripMenuItem";
-            this.RFSwitchToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.RFSwitchToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.RFSwitchToolStripMenuItem.Text = "RF SWITCH";
             this.RFSwitchToolStripMenuItem.Click += new System.EventHandler(this.RFSwitchToolStripMenuItem_Click);
             // 
             // AttenuatorToolStripMenuItem
             // 
             this.AttenuatorToolStripMenuItem.Name = "AttenuatorToolStripMenuItem";
-            this.AttenuatorToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.AttenuatorToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.AttenuatorToolStripMenuItem.Text = "ATTENUATOR";
             this.AttenuatorToolStripMenuItem.Click += new System.EventHandler(this.AttenuatorToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(144, 22);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(147, 22);
             this.toolStripMenuItem1.Text = "RRU";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.ToolStripMenuItem1_Click);
             // 
@@ -310,7 +314,7 @@
             this.duplicateFromFileToolStripMenuItem,
             this.createATTFilesToolStripMenuItem});
             this.tOOLSToolStripMenuItem.Name = "tOOLSToolStripMenuItem";
-            this.tOOLSToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
+            this.tOOLSToolStripMenuItem.Size = new System.Drawing.Size(55, 20);
             this.tOOLSToolStripMenuItem.Text = "TOOLS";
             // 
             // duplicateFromFileToolStripMenuItem
@@ -704,6 +708,10 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.chkPath4);
+            this.groupBox5.Controls.Add(this.chkPath3);
+            this.groupBox5.Controls.Add(this.chkPath2);
+            this.groupBox5.Controls.Add(this.chkPath1);
             this.groupBox5.Controls.Add(this.ckbMuitlMeas);
             this.groupBox5.Controls.Add(this.chkPort32);
             this.groupBox5.Controls.Add(this.chkPort31);
@@ -745,12 +753,58 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Measuring Port";
             // 
+            // chkPath4
+            // 
+            this.chkPath4.AutoSize = true;
+            this.chkPath4.Location = new System.Drawing.Point(338, 133);
+            this.chkPath4.Name = "chkPath4";
+            this.chkPath4.Size = new System.Drawing.Size(65, 22);
+            this.chkPath4.TabIndex = 40;
+            this.chkPath4.Text = "Path4";
+            this.chkPath4.UseVisualStyleBackColor = true;
+            this.chkPath4.CheckedChanged += new System.EventHandler(this.chkPath_CheckedChanged);
+            // 
+            // chkPath3
+            // 
+            this.chkPath3.AutoSize = true;
+            this.chkPath3.Location = new System.Drawing.Point(238, 132);
+            this.chkPath3.Name = "chkPath3";
+            this.chkPath3.Size = new System.Drawing.Size(65, 22);
+            this.chkPath3.TabIndex = 39;
+            this.chkPath3.Text = "Path3";
+            this.chkPath3.UseVisualStyleBackColor = true;
+            this.chkPath3.CheckedChanged += new System.EventHandler(this.chkPath_CheckedChanged);
+            // 
+            // chkPath2
+            // 
+            this.chkPath2.AutoSize = true;
+            this.chkPath2.Location = new System.Drawing.Point(138, 133);
+            this.chkPath2.Name = "chkPath2";
+            this.chkPath2.Size = new System.Drawing.Size(65, 22);
+            this.chkPath2.TabIndex = 38;
+            this.chkPath2.Text = "Path2";
+            this.chkPath2.UseVisualStyleBackColor = true;
+            this.chkPath2.CheckedChanged += new System.EventHandler(this.chkPath_CheckedChanged);
+            // 
+            // chkPath1
+            // 
+            this.chkPath1.AutoSize = true;
+            this.chkPath1.Checked = true;
+            this.chkPath1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPath1.Location = new System.Drawing.Point(41, 133);
+            this.chkPath1.Name = "chkPath1";
+            this.chkPath1.Size = new System.Drawing.Size(65, 22);
+            this.chkPath1.TabIndex = 37;
+            this.chkPath1.Text = "Path1";
+            this.chkPath1.UseVisualStyleBackColor = true;
+            this.chkPath1.CheckedChanged += new System.EventHandler(this.chkPath_CheckedChanged);
+            // 
             // ckbMuitlMeas
             // 
             this.ckbMuitlMeas.AutoSize = true;
             this.ckbMuitlMeas.Checked = true;
             this.ckbMuitlMeas.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ckbMuitlMeas.Location = new System.Drawing.Point(61, 134);
+            this.ckbMuitlMeas.Location = new System.Drawing.Point(61, 158);
             this.ckbMuitlMeas.Name = "ckbMuitlMeas";
             this.ckbMuitlMeas.Size = new System.Drawing.Size(124, 22);
             this.ckbMuitlMeas.TabIndex = 36;
@@ -1002,13 +1056,13 @@
             this.chkALL.AutoSize = true;
             this.chkALL.Checked = true;
             this.chkALL.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkALL.Location = new System.Drawing.Point(14, 134);
+            this.chkALL.Location = new System.Drawing.Point(14, 158);
             this.chkALL.Name = "chkALL";
             this.chkALL.Size = new System.Drawing.Size(52, 22);
             this.chkALL.TabIndex = 1;
             this.chkALL.Text = "ALL";
             this.chkALL.UseVisualStyleBackColor = true;
-            this.chkALL.CheckedChanged += new System.EventHandler(this.chkAllPort_CheckedChanged);
+            this.chkALL.CheckedChanged += new System.EventHandler(this.chkAll_CheckedChanged);
             // 
             // chkPort8
             // 
@@ -1228,7 +1282,7 @@
             this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(10, 6);
             this.chart1.Name = "chart1";
-            this.chart1.Size = new System.Drawing.Size(994, 306);
+            this.chart1.Size = new System.Drawing.Size(997, 312);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
             title1.Name = "Power";
@@ -1638,6 +1692,10 @@
         private System.Windows.Forms.TextBox txbUser;
         private System.Windows.Forms.TextBox txbStation;
         private System.Windows.Forms.CheckBox ckbMuitlMeas;
+        private System.Windows.Forms.CheckBox chkPath3;
+        private System.Windows.Forms.CheckBox chkPath2;
+        private System.Windows.Forms.CheckBox chkPath1;
+        private System.Windows.Forms.CheckBox chkPath4;
     }
 }
 

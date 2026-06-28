@@ -523,6 +523,8 @@ namespace _5GAutoTool
                 checkbox.Checked = chkALL.Checked;
             }
         }
+
+
         //==========================================================================
 
         //++++++++++++++++++++ TOOLSTRIP MENU ITEMS ++++++++++++++++++++++++++++++++
@@ -844,9 +846,10 @@ namespace _5GAutoTool
         {
             frmCreateATTFile.ShowDialog();
         }
-
+        private List<CheckBox> portCheckboxes;
         private void Form5GAT_Load(object sender, EventArgs e)
         {
+
             this.FormBorderStyle = FormBorderStyle.Sizable;
             //log view
             lvwLog.Clear();
@@ -895,8 +898,65 @@ namespace _5GAutoTool
             {
                 Console.WriteLine(ex.Message);
             }
+
+
+                    portCheckboxes = new List<CheckBox>()
+            {
+                chkPort1, chkPort2, chkPort3, chkPort4,
+                chkPort5, chkPort6, chkPort7, chkPort8,
+                chkPort9, chkPort10, chkPort11, chkPort12,
+                chkPort13, chkPort14, chkPort15, chkPort16,
+                chkPort17, chkPort18, chkPort19, chkPort20,
+                chkPort21, chkPort22, chkPort23, chkPort24,
+                chkPort25, chkPort26, chkPort27, chkPort28,
+                chkPort29, chkPort30, chkPort31, chkPort32,
+               
+            };
+
         }
 
+        private void UpdatePortSelection()
+        {
+            // Bỏ chọn tất cả trước
+            foreach (var cb in portCheckboxes)
+                cb.Checked = false;
+
+            // Path1 -> P1-P8
+            if (chkPath1.Checked)
+                for (int i = 0; i < 8; i++)
+                    portCheckboxes[i].Checked = true;
+
+            // Path2 -> P9-P16
+            if (chkPath2.Checked)
+                for (int i = 8; i < 16; i++)
+                    portCheckboxes[i].Checked = true;
+
+            // Path3 -> P17-P24
+            if (chkPath3.Checked)
+                for (int i = 16; i < 24; i++)
+                    portCheckboxes[i].Checked = true;
+
+            // Path4 -> P25-P32
+            if (chkPath4.Checked)
+                for (int i = 24; i < 32; i++)
+                    portCheckboxes[i].Checked = true;
+        }
+
+        private void chkPath_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdatePortSelection();
+        }
+        private void chkAll_CheckedChanged(object sender, EventArgs e)
+        {
+            bool value = chkALL.Checked;
+
+            chkPath1.Checked = value;
+            chkPath2.Checked = value;
+            chkPath3.Checked = value;
+            chkPath4.Checked = value;
+
+            UpdatePortSelection();
+        }
         private void tabLogs_DrawItem(object sender, DrawItemEventArgs e)
         {
             TabPage tabPage = tabLogs.TabPages[e.Index];
