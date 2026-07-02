@@ -11,6 +11,7 @@ namespace _5GAutoTool
 {
     public partial class Form5GAT
     {
+        public Dictionary<int, string> currNRTMByPath = new Dictionary<int, string>();
         //++++++++++++++++++ MEASUREMENT BACKGROUND WORKER +++++++++++++++++++++++++++++++++++++
         //TODO:measurementBackgroundWorker_DoWork
         #region measurementBackgroundWorker_DoWork
@@ -101,7 +102,7 @@ namespace _5GAutoTool
             userID = txbUser.Text;
             processValue = txbStation.Text + "_" + freqMHz.ToString();
             productValue = "";
-
+            
             //10.1.2024 - clear Chart
             //chart1.Series.Clear(); //tam thoi comment lai
             enRecordLog = true; //start writing log to file
@@ -184,6 +185,8 @@ namespace _5GAutoTool
                         ProgressLabel($"Clearing List of Testing Port...");
                         PortListClearData(PortMappings);
                         //TODO: run sequence testing port in list
+
+
                         if (ckbMuitlMeas.Checked)
                         {
                             try
@@ -214,6 +217,10 @@ namespace _5GAutoTool
                         {
                             if (measurementBackgroundWorker.CancellationPending) return;
                             System.Threading.Thread.Sleep(1);
+                            if (testingMode == "TX")
+                            {
+                                RFSwitchRRUPath("TX", mtlport);
+                            }
                             while (timeout < loopTime)
                             {
                                 ProgressLabel($"Measuring Port:{mtlport.ToString()}");

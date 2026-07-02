@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="5GAutoTool.exe" size="1776128">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="5GAutoTool.exe" size="1779200">
       <assemblyIdentity name="5GAutoTool" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>szVPZAN8WK+627CshSeMD6mMM2TpqBfQ35XEvoEvqz4=</dsig:DigestValue>
+        <dsig:DigestValue>QX/wVSe/7+l1G4fwtGCKxDjZWti4rYPPfcK4C3kUbQY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

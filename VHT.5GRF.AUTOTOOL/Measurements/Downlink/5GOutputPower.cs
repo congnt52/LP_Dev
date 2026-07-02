@@ -59,12 +59,15 @@ namespace _5GAutoTool
             TXPower = null;
             try
             {
-                if (NRTM != mainForm.currNRTM)
+                int pathIndex = ((port[0]-1)/8+1);
+                bool alreadyLoaded = mainForm.currNRTMByPath.TryGetValue(pathIndex, out string loadedNRTM) && (loadedNRTM == NRTM);
+                if (!alreadyLoaded)
                 {
                     bbu.Generate_NRTM(NRTM);
                     log.Log("Setting up measurement...");
-                    vsa.LoadMeasurementSetup(NRTM, setFreq);
-                    
+                    vsa.LoadMeasurementSetup(NRTM, setFreq, port);
+
+                    mainForm.currNRTMByPath[pathIndex] = NRTM;
                     mainForm.currNRTM = NRTM;
                 }
                 //vsa.SetParameter(setFreq, setAtt);

@@ -1,5 +1,6 @@
 ﻿using System;
 using _5GAutoTool.Instruments.VSA.VSA_Instruments;
+using Keysight.KtM941x;
 
 namespace _5GAutoTool
 {
@@ -232,6 +233,29 @@ namespace _5GAutoTool
             }
         }
         /*.............................................Load Setup tham số các bai do...............................................*/
+        public void LoadMeasurementSetup(string NRTM, string setFreq, int pathIndex)
+        {
+            if (instrumentVSA == "LitePoint" || instrumentVSA == "IQFR1")
+            {
+                iqfr1.LoadMeasurementSetup(NRTM, setFreq, pathIndex);
+            }
+            else
+            {
+                // Xử lý cũ cho các dòng máy FSW26, FSV3030, N9020A...
+                // vsa.LoadMeasurementSetup(NRTM, setFreq);
+            }
+        }
+        public void LoadMeasurementSetup(string selectmeasurement, string Freq, int[] Port)
+        {
+            if (instrumentVSA == "IQFR1-RU")
+            {
+                iqfr1.LoadMeasurementSetup(selectmeasurement, Freq, Port);
+            }
+            else
+            {
+                LoadMeasurementSetup(selectmeasurement, Freq);
+            }
+        }
         public void LoadMeasurementSetup(string selectmeasurement, string Freq)
         {
             if (instrumentVSA == "FSV3030")

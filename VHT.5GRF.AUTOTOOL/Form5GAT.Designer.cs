@@ -143,17 +143,17 @@
             this.grdParams = new System.Windows.Forms.DataGridView();
             this.tabLogs = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.lvwLog = new _5GAutoTool.DoubleBufferedListView();
             this.runningTask = new System.Windows.Forms.Label();
             this.proLoad = new System.Windows.Forms.ProgressBar();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.trvTestCases = new _5GAutoTool.DoubleBufferedTreeView();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.splitContainer5 = new System.Windows.Forms.SplitContainer();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.lblProgressVal = new System.Windows.Forms.Label();
+            this.trvTestCases = new _5GAutoTool.DoubleBufferedTreeView();
+            this.lvwLog = new _5GAutoTool.DoubleBufferedListView();
             this.menuStripControl.SuspendLayout();
             this.grpControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogoVHT)).BeginInit();
@@ -1069,6 +1069,7 @@
             this.chkPort8.AutoSize = true;
             this.chkPort8.Checked = true;
             this.chkPort8.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPort8.Enabled = false;
             this.chkPort8.Location = new System.Drawing.Point(61, 108);
             this.chkPort8.Name = "chkPort8";
             this.chkPort8.Size = new System.Drawing.Size(45, 22);
@@ -1081,6 +1082,7 @@
             this.chkPort4.AutoSize = true;
             this.chkPort4.Checked = true;
             this.chkPort4.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPort4.Enabled = false;
             this.chkPort4.Location = new System.Drawing.Point(14, 107);
             this.chkPort4.Name = "chkPort4";
             this.chkPort4.Size = new System.Drawing.Size(45, 22);
@@ -1093,6 +1095,7 @@
             this.chkPort7.AutoSize = true;
             this.chkPort7.Checked = true;
             this.chkPort7.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPort7.Enabled = false;
             this.chkPort7.Location = new System.Drawing.Point(61, 81);
             this.chkPort7.Name = "chkPort7";
             this.chkPort7.Size = new System.Drawing.Size(45, 22);
@@ -1105,6 +1108,7 @@
             this.chkPort6.AutoSize = true;
             this.chkPort6.Checked = true;
             this.chkPort6.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPort6.Enabled = false;
             this.chkPort6.Location = new System.Drawing.Point(61, 53);
             this.chkPort6.Name = "chkPort6";
             this.chkPort6.Size = new System.Drawing.Size(45, 22);
@@ -1117,6 +1121,7 @@
             this.chkPort3.AutoSize = true;
             this.chkPort3.Checked = true;
             this.chkPort3.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPort3.Enabled = false;
             this.chkPort3.Location = new System.Drawing.Point(14, 80);
             this.chkPort3.Name = "chkPort3";
             this.chkPort3.Size = new System.Drawing.Size(45, 22);
@@ -1129,6 +1134,7 @@
             this.chkPort5.AutoSize = true;
             this.chkPort5.Checked = true;
             this.chkPort5.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPort5.Enabled = false;
             this.chkPort5.Location = new System.Drawing.Point(61, 26);
             this.chkPort5.Name = "chkPort5";
             this.chkPort5.Size = new System.Drawing.Size(45, 22);
@@ -1141,6 +1147,7 @@
             this.chkPort2.AutoSize = true;
             this.chkPort2.Checked = true;
             this.chkPort2.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPort2.Enabled = false;
             this.chkPort2.Location = new System.Drawing.Point(14, 52);
             this.chkPort2.Name = "chkPort2";
             this.chkPort2.Size = new System.Drawing.Size(45, 22);
@@ -1153,6 +1160,7 @@
             this.chkPort1.AutoSize = true;
             this.chkPort1.Checked = true;
             this.chkPort1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPort1.Enabled = false;
             this.chkPort1.Location = new System.Drawing.Point(14, 26);
             this.chkPort1.Name = "chkPort1";
             this.chkPort1.Size = new System.Drawing.Size(45, 22);
@@ -1266,7 +1274,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 27);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(435, 370);
+            this.tabPage2.Size = new System.Drawing.Size(436, 372);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "CHART";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -1282,7 +1290,7 @@
             this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(10, 6);
             this.chart1.Name = "chart1";
-            this.chart1.Size = new System.Drawing.Size(997, 312);
+            this.chart1.Size = new System.Drawing.Size(1000, 318);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
             title1.Name = "Power";
@@ -1294,7 +1302,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 27);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(435, 370);
+            this.tabPage3.Size = new System.Drawing.Size(436, 372);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "PARAMS";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -1307,7 +1315,7 @@
             this.grdParams.Location = new System.Drawing.Point(3, 3);
             this.grdParams.Name = "grdParams";
             this.grdParams.RowHeadersWidth = 51;
-            this.grdParams.Size = new System.Drawing.Size(429, 364);
+            this.grdParams.Size = new System.Drawing.Size(430, 366);
             this.grdParams.TabIndex = 0;
             // 
             // tabLogs
@@ -1334,22 +1342,6 @@
             this.tabPage4.TabIndex = 0;
             this.tabPage4.Text = "LOG";
             this.tabPage4.UseVisualStyleBackColor = true;
-            // 
-            // lvwLog
-            // 
-            this.lvwLog.BackColor = System.Drawing.SystemColors.Window;
-            this.lvwLog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvwLog.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lvwLog.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.lvwLog.FullRowSelect = true;
-            this.lvwLog.HideSelection = false;
-            this.lvwLog.Location = new System.Drawing.Point(3, 3);
-            this.lvwLog.Name = "lvwLog";
-            this.lvwLog.Size = new System.Drawing.Size(542, 351);
-            this.lvwLog.TabIndex = 0;
-            this.lvwLog.UseCompatibleStateImageBehavior = false;
-            this.lvwLog.View = System.Windows.Forms.View.Details;
-            this.lvwLog.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvwLog_MouseClick);
             // 
             // runningTask
             // 
@@ -1408,22 +1400,6 @@
             this.groupBox4.TabIndex = 16;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "TREE VIEW";
-            // 
-            // trvTestCases
-            // 
-            this.trvTestCases.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.trvTestCases.BackColor = System.Drawing.SystemColors.Window;
-            this.trvTestCases.CheckBoxes = true;
-            this.trvTestCases.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.trvTestCases.Location = new System.Drawing.Point(20, 27);
-            this.trvTestCases.Name = "trvTestCases";
-            this.trvTestCases.ShowNodeToolTips = true;
-            this.trvTestCases.Size = new System.Drawing.Size(299, 345);
-            this.trvTestCases.TabIndex = 5;
-            this.trvTestCases.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.trvTestCases_AfterCheck);
-            this.trvTestCases.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trvTestCases_AfterSelect);
             // 
             // splitContainer4
             // 
@@ -1512,6 +1488,39 @@
             this.lblProgressVal.TabIndex = 16;
             this.lblProgressVal.Text = "0%";
             this.lblProgressVal.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // trvTestCases
+            // 
+            this.trvTestCases.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.trvTestCases.BackColor = System.Drawing.SystemColors.Window;
+            this.trvTestCases.CheckBoxes = true;
+            this.trvTestCases.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.trvTestCases.Location = new System.Drawing.Point(20, 27);
+            this.trvTestCases.Name = "trvTestCases";
+            this.trvTestCases.ShowNodeToolTips = true;
+            this.trvTestCases.Size = new System.Drawing.Size(299, 345);
+            this.trvTestCases.TabIndex = 5;
+            this.trvTestCases.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.trvTestCases_AfterCheck);
+            this.trvTestCases.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.trvTestCases_AfterSelect);
+            // 
+            // lvwLog
+            // 
+            this.lvwLog.BackColor = System.Drawing.SystemColors.Window;
+            this.lvwLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvwLog.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lvwLog.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.lvwLog.FullRowSelect = true;
+            this.lvwLog.HideSelection = false;
+            this.lvwLog.Location = new System.Drawing.Point(3, 3);
+            this.lvwLog.Name = "lvwLog";
+            this.lvwLog.Size = new System.Drawing.Size(542, 351);
+            this.lvwLog.TabIndex = 0;
+            this.lvwLog.UseCompatibleStateImageBehavior = false;
+            this.lvwLog.View = System.Windows.Forms.View.Details;
+            this.lvwLog.SelectedIndexChanged += new System.EventHandler(this.lvwLog_SelectedIndexChanged);
+            this.lvwLog.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvwLog_MouseClick);
             // 
             // Form5GAT
             // 

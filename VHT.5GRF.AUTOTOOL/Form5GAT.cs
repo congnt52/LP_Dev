@@ -70,7 +70,7 @@ namespace _5GAutoTool
             trvTestCases.ImageList = imageList;
             TestcasePending = new List<TestcaseNode>();
             testingPortList = new List<int>();
-
+            //lvwLog.Items.Clear();
             // Khai báo backgroundWorker
             measurementBackgroundWorker = new BackgroundWorker();
             measurementBackgroundWorker.WorkerSupportsCancellation = true; // cho phep dung tien trinh
@@ -233,6 +233,7 @@ namespace _5GAutoTool
         private void btnStart_Click(object sender, EventArgs e)
         {
             //Reading device information
+            
             ProgressLabel("Reading Measurement Parameter...");
             RruSerial = txtRRUSerial.Text;
 
@@ -851,6 +852,26 @@ namespace _5GAutoTool
         {
 
             this.FormBorderStyle = FormBorderStyle.Sizable;
+            portCheckboxes = new List<CheckBox>()
+            {
+                chkPort1, chkPort2, chkPort3, chkPort4,
+                chkPort5, chkPort6, chkPort7, chkPort8,
+                chkPort9, chkPort10, chkPort11, chkPort12,
+                chkPort13, chkPort14, chkPort15, chkPort16,
+                chkPort17, chkPort18, chkPort19, chkPort20,
+                chkPort21, chkPort22, chkPort23, chkPort24,
+                chkPort25, chkPort26, chkPort27, chkPort28,
+                chkPort29, chkPort30, chkPort31, chkPort32,
+
+            };
+            //foreach (var cb in portCheckboxes)
+            //{
+            //    cb.Enabled = false; // Disable all port checkboxes initially
+            //}
+            for (int i = 0; i < 32; i++)
+            {
+                portCheckboxes[i].Enabled = false;
+            }
             //log view
             lvwLog.Clear();
             lvwLog.View = System.Windows.Forms.View.Details;
@@ -900,19 +921,7 @@ namespace _5GAutoTool
             }
 
 
-                    portCheckboxes = new List<CheckBox>()
-            {
-                chkPort1, chkPort2, chkPort3, chkPort4,
-                chkPort5, chkPort6, chkPort7, chkPort8,
-                chkPort9, chkPort10, chkPort11, chkPort12,
-                chkPort13, chkPort14, chkPort15, chkPort16,
-                chkPort17, chkPort18, chkPort19, chkPort20,
-                chkPort21, chkPort22, chkPort23, chkPort24,
-                chkPort25, chkPort26, chkPort27, chkPort28,
-                chkPort29, chkPort30, chkPort31, chkPort32,
-               
-            };
-
+           
         }
 
         private void UpdatePortSelection()
@@ -957,6 +966,14 @@ namespace _5GAutoTool
 
             UpdatePortSelection();
         }
+
+        private void lvwLog_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+       
+
         private void tabLogs_DrawItem(object sender, DrawItemEventArgs e)
         {
             TabPage tabPage = tabLogs.TabPages[e.Index];
@@ -1148,6 +1165,43 @@ namespace _5GAutoTool
             else if (rfSwitch1.Status == "Connected")
             {
                 rfSwitch1.SetSwitch(nodeA, "N" + (port + 1), out response);
+            }
+        }
+
+        private void RFSwitchRRUPath(string testcase, int[] ports)
+        {
+            if (ports == null || ports.Length == 0) return;
+
+            string response;
+            string nodeA = "";
+            if (testcase == "TX") nodeA = "A1";
+            if (testcase == "RX") nodeA = "A2";
+            if (string.IsNullOrEmpty(nodeA)) return;
+
+            int pathIndex = (ports[0] - 1) / 8; // Path1..Path4 => 0..3
+            int station = pathIndex / 2;        // Path1-2 use station 0, Path3-4 use station 1
+            int nodeOffset = (pathIndex % 2) * 8;
+
+            if (rfSwitch2.Status == "Connected" & rfSwitch3.Status == "Connected")
+            {
+                RFSwitch slaveSwitch = station == 0 ? rfSwitch2 : rfSwitch3;
+                rfSwitch1.SetSwitch(nodeA, "N" + (station + 1), out response);
+
+                for (int i = 0; i < ports.Length; i++)
+                {
+                    int litePointPort = i + 1;
+                    int node = nodeOffset + litePointPort;
+                    slaveSwitch.SetSwitch("A" + litePointPort, "N" + node, out response);
+                }
+            }
+            else if (rfSwitch1.Status == "Connected")
+            {
+                for (int i = 0; i < ports.Length; i++)
+                {
+                    int litePointPort = i + 1;
+                    int node = pathIndex * 8 + litePointPort;
+                    rfSwitch1.SetSwitch("A" + litePointPort, "N" + node, out response);
+                }
             }
         }
 
